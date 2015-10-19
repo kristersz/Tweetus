@@ -1,0 +1,10 @@
+{
+  "AppSettings": {
+    "SiteTitle": "Tweetus.Web"
+  },
+  "Data": {
+    "DefaultConnection": {
+      "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-Tweetus.Web-7d21512e-61fe-4a9e-a3ec-997b304ad91a;Trusted_Connection=True;MultipleActiveResultSets=true"
+    }
+  }
+}
