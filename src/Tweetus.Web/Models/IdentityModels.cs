@@ -2,27 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNet.Identity3.MongoDB;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Framework.OptionsModel;
+using MongoDB.Driver;
 
 namespace Tweetus.Web.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
+        public string FullName { get; set; }
+        public byte[] ProfilePicture { get; set; }
     }
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : MongoIdentityContext<ApplicationUser, IdentityRole>
     {
-        protected override void OnModelCreating(ModelBuilder builder)
+        public ApplicationDbContext()
+        : base()
         {
-            base.OnModelCreating(builder);
-            // Customize the ASP.NET Identity model and override the defaults if needed.
-            // For example, you can rename the ASP.NET Identity table names and more.
-            // Add your customizations after calling base.OnModelCreating(builder);
+            string connectionString = "mongodb://localhost:27017";
+            string databaseName = "tweetusdb";
+
+            var client = new MongoClient(connectionString);
+            var database = client.GetDatabase(databaseName);
+
+            this.Users = database.GetCollection<ApplicationUser>("users");
+            this.Roles = database.GetCollection<IdentityRole>("roles");
         }
     }
 }

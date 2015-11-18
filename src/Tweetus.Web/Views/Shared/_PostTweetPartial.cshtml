@@ -1,0 +1,25 @@
+﻿@using (Html.BeginForm("PostTweet", "Tweet", null, FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm", target = "uploadTarget" }))
+{
+    <div class="form-group">
+        <textarea class="form-control" name="Content" rows="3" draggable="false" ng-model="currentTweet"></textarea>
+        <span class="pull-right" ng-class="{ 'text-primary': currentTweet.length <= 169, 'text-danger': currentTweet.length > 169 }">
+            {{ 169 - currentTweet.length }} characters remaining
+        </span>
+    </div>
+
+    <div class="form-group">
+        <div class="input-group" style="width: 100%">
+            <span class="input-group-btn">
+                <span class="btn btn-primary btn-file">
+                    Browse&hellip; <input type="file" name="File" id="fileUpload" />
+                </span>
+            </span>
+            <input type="text" class="form-control" readonly>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit" ng-disabled="currentTweet.length === 0 || currentTweet.length > 169">
+        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>  Tweet
+    </button>
+}
+<iframe id="uploadTarget" name="uploadTarget" height="0" width="0" frameborder="0" scrolling="yes"></iframe>  

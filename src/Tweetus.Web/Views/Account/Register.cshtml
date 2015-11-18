@@ -5,10 +5,24 @@
 
 <h2>@ViewData["Title"].</h2>
 
-<form asp-controller="Account" asp-action="Register" method="post" class="form-horizontal" role="form">
+<form asp-controller="Account" asp-action="Register" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
     <h4>Create a new account.</h4>
     <hr />
     <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="UserName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="UserName" class="form-control" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="FullName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+    </div>
     <div class="form-group">
         <label asp-for="Email" class="col-md-2 control-label"></label>
         <div class="col-md-10">
@@ -28,6 +42,13 @@
         <div class="col-md-10">
             <input asp-for="ConfirmPassword" class="form-control" />
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProfilePicture" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="ProfilePicture" class="form-control" />
+            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">

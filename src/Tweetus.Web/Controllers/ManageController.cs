@@ -10,6 +10,7 @@ using Microsoft.AspNet.Mvc;
 using Tweetus.Web;
 using Tweetus.Web.Models;
 using Tweetus.Web.Services;
+using AspNet.Identity3.MongoDB;
 
 namespace Tweetus.Web.Controllers
 {
@@ -354,7 +355,7 @@ namespace Tweetus.Web.Controllers
 
         private async Task<ApplicationUser> GetCurrentUserAsync()
         {
-            return await _userManager.FindByIdAsync(Context.User.GetUserId());
+            return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

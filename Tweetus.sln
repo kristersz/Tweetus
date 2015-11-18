@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tweetus.Web", "src\Tweetus.Web\Tweetus.Web.xproj", "{067BDD88-4BFE-4EA2-BDA4-34EBCEEEB9C7}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Identity3.MongoDB", "src\AspNet.Identity3.MongoDB\AspNet.Identity3.MongoDB.xproj", "{ACD5CD8F-C1A6-4570-895C-055BA863F8B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,11 +24,16 @@ Global
 		{067BDD88-4BFE-4EA2-BDA4-34EBCEEEB9C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{067BDD88-4BFE-4EA2-BDA4-34EBCEEEB9C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{067BDD88-4BFE-4EA2-BDA4-34EBCEEEB9C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACD5CD8F-C1A6-4570-895C-055BA863F8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACD5CD8F-C1A6-4570-895C-055BA863F8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACD5CD8F-C1A6-4570-895C-055BA863F8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACD5CD8F-C1A6-4570-895C-055BA863F8B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{067BDD88-4BFE-4EA2-BDA4-34EBCEEEB9C7} = {250517E2-AAAF-4E8F-9C7A-9155A49B717C}
+		{ACD5CD8F-C1A6-4570-895C-055BA863F8B4} = {250517E2-AAAF-4E8F-9C7A-9155A49B717C}
 	EndGlobalSection
 EndGlobal

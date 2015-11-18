@@ -1,0 +1,99 @@
+﻿@model List<ConversationVM>
+
+@using System.Security.Claims
+@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "Conversations";
+}
+
+<div ng-app="tweetusApp">
+    <div class="row ng-cloak margin-top" ng-controller="conversationController" ng-init="init(@JsonConvert.SerializeObject(Model))">
+        <div class="margin-top">
+            <div class="panel panel-primary">
+                <div class="panel-heading clearfix">
+                    <h3 class="panel-title pull-left">@ViewBag.Title</h3>
+                    <button class="btn btn-default pull-right" data-toggle="modal" data-target="#newConversationModal">
+                        <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Start new conversation
+                    </button>
+                </div>
+                <div class="panel-body">
+                    <div class="panel panel-default" ng-repeat="conversation in vm">
+                        <div class="panel-heading">
+                            <a class="panel-title" ng-click="openConversation(conversation.ConversationId)">{{ conversation.Name }}</a>
+                        </div>
+                        <div class="panel-body">
+                            <span>Last message - <strong>{{ conversation.Messages[0].Username }}: {{ conversation.Messages[0].Content }}</strong></span>
+                            <span class="pull-right">Sent {{ conversation.Messages[0].SentOn | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="newConversationModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">New message</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="recipient">Recipient</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon1">@@</span>
+                                    <input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1" ng-model="recipient">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea class="form-control" name="message" rows="3" draggable="false" ng-model="message"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" ng-click="startNewConversation()" ng-disabled="recipient.lenght == 0 || message.length == 0">Send</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="conversationModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">{{ openConversation.conversationName }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item clearfix" ng-repeat="message in openConversation.messages">
+                                @*<h4 class="list-group-item-heading"></h4>*@
+                                <p class="list-group-item-text pull-left"><strong>{{ message.Username }}:</strong> {{ message.Content }}</p>
+                                <p class="list-group-item-text pull-right">{{ message.SentOn | date:'yyyy-MM-dd HH:mm:ss' }}</p>
+                            </a>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea class="form-control" name="message" rows="3" draggable="false" ng-model="message"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" ng-click="sendNewMessage()" ng-disabled="message.length == 0">Send</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/app.js"></script>
+    <script src="~/js/services/conversationService.js"></script>
+    <script src="~/js/controllers/conversationController.js"></script>
+}

@@ -1,0 +1,31 @@
+﻿<div class="panel panel-primary" ng-repeat="tweet in vm.Tweets | orderBy: '-TweetedOn'">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <a  ng-href="/User/Profile?username={{tweet.TweetedByName}}"><strong>{{ tweet.TweetedByName }}</strong></a>
+             @@{{ tweet.TweetedByHandle }} - {{ tweet.TweetedOn | date:'yyyy-MM-dd HH:mm:ss' }}
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12" style="word-wrap: break-word">
+                <p>{{ tweet.Content }}</p>
+            </div>
+        </div>
+
+        <img ng-src="data:{{tweet.ImageMimeType}};base64,{{tweet.ImageBase64}}" ng-show="tweet.ImageBase64.length > 0" class="img-responsive" />
+    </div>
+    <div class="panel-footer">
+        <button type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Reply
+        </button>
+        <button type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> Retweet
+        </button>
+        <button type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Like
+        </button>
+        <button type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
+        </button>
+    </div>
+</div>

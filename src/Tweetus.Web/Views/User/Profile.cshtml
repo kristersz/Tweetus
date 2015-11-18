@@ -1,0 +1,125 @@
+﻿@model ProfileVM
+
+@using System.Security.Claims
+@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "Profile";
+}
+
+@section styles {
+    <style>
+        .margin-top {
+            margin-top: 15px;
+        }
+    </style>
+}
+
+<div ng-app="tweetusApp">
+    <img class="img-responsive" src="http://placehold.it/1170x250" />
+    <div class="row ng-cloak" style="margin-top: 20px;" ng-controller="profileController" ng-init="init(@JsonConvert.SerializeObject(Model))">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <img ng-src="data:image/jpeg;base64,{{vm.ProfilePicture}}" ng-show="vm.ProfilePicture.length > 0" class="img-responsive" />
+                    @*<img src="http://placehold.it/300x250" class="img-responsive img-thumbnail" />*@
+                </div>
+                <div class="panel-body">
+                    <a href="@Url.Action("Profile", "User", new { username = Model.UserName })"><strong>{{ vm.UserName }}</strong></a>
+                    @@{{ vm.UserName }}
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Legit dude</li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span><a href="http://kristerszimecs.com" target="_blank"> kristerszimecs.com</a></li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Joined 2015-11-01</li>
+                </ul>
+            </div>
+
+            <div ng-hide="vm.IsViewersProfile">
+                <button type="button" class="btn btn-primary col-md-12" ng-click="followUser()" ng-hide="vm.ViewerAlreadyFollowing">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Follow {{ vm.UserName }}
+                </button>
+                <button type="button" class="btn btn-danger col-md-12" ng-show="vm.ViewerAlreadyFollowing">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unfollow {{ vm.UserName }}
+                </button>
+                <button type="button" class="btn btn-primary col-md-12 margin-top" data-toggle="modal" data-target="#tweetToUserModal">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Tweet to {{ vm.UserName }}
+                </button>  
+            </div>    
+        </div>
+
+        <div class="col-md-6">
+            <div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-pills" role="tablist">
+                    <li role="presentation" class="active"><a href="#tweets" aria-controls="tweets" role="tab" data-toggle="tab">Tweets <span class="badge">{{ vm.Tweets.length }}</span></a></li>
+                    <li role="presentation"><a href="#following" aria-controls="following" role="tab" data-toggle="tab">Following <span class="badge">{{ vm.FollowingUsers.length }}</span></a></li>
+                    <li role="presentation"><a href="#followers" aria-controls="followers" role="tab" data-toggle="tab">Followers <span class="badge">100</span></a></li>
+                    <li role="presentation"><a href="#likes" aria-controls="likes" role="tab" data-toggle="tab">Likes <span class="badge">100</span></a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane fade in active margin-top" id="tweets">
+                        @Html.Partial("_TweetFeedPartial")
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade margin-top" id="following">
+                        <div class="panel panel-primary" ng-repeat="user in vm.FollowingUsers">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <a ng-href="/User/Profile?username={{user.FollowingUserName}}"><strong>{{ user.FollowingUserName }}</strong></a>
+                                    @@{{ user.FollowingUserName }}
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12" style="word-wrap: break-word">
+                                        <p>{{ user.FollowingUserAbout }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <button type="button" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unfollow
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade" id="followers">
+                        Users that follow me
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade" id="likes">
+                        Tweets that I like
+                    </div>
+                </div>
+            </div>           
+        </div>
+
+        <div class="col-md-3">
+            @Html.Partial("_FooterPartial")
+        </div>
+
+        <div class="modal fade" id="tweetToUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Tweet to @@{{ vm.UserName }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        @Html.Partial("_PostTweetPartial")
+                    </div>
+                    <div class="modal-footer">                   
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/app.js"></script>
+    <script src="~/js/services/dashboardService.js"></script>
+    <script src="~/js/controllers/profileController.js"></script>
+}

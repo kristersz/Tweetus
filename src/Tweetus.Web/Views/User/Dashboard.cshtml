@@ -1,0 +1,74 @@
+﻿@model DashboardVM
+
+@using System.Security.Claims
+@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div ng-app="tweetusApp">
+    <div class="row ng-cloak margin-top" ng-controller="dashboardController" ng-init="init(@JsonConvert.SerializeObject(Model))">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <img ng-src="data:image/jpeg;base64,{{vm.ProfilePicture}}" ng-show="vm.ProfilePicture.length > 0" class="img-responsive" />
+                    @*<img src="http://placehold.it/230x65" class="img-responsive img-thumbnail" />*@
+                </div>
+                <div class="panel-body">
+                    <a href="@Url.Action("Profile", "User", new { username = User.GetUserName() })"><strong>@User.GetUserName()</strong></a>
+                    @@@User.GetUserName()
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item"><span class="badge">{{ vm.TweetCount }}</span> Tweets</li>
+                    <li class="list-group-item"><span class="badge">{{ vm.FollowerCount }}</span> Followers</li>
+                    <li class="list-group-item"><span class="badge">{{ vm.FollowingCount }}</span> Following</li>
+                </ul>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Trending now...
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item">ASP.NET 5</li>
+                    <li class="list-group-item">MVC 6</li>
+                    <li class="list-group-item">Visual Studio 2015</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <a role="button" data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color: white">
+                        What is happening? Tweet now!
+                    </a>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                @Html.Partial("_PostTweetPartial")                             
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            @Html.Partial("_TweetFeedPartial")
+        </div>
+
+        <div class="col-md-3">
+            @Html.Partial("_FooterPartial")
+        </div>
+    </div>
+</div>
+
+@section scripts {   
+    <script src="~/js/app.js"></script>   
+    <script src="~/js/services/dashboardService.js"></script> 
+    <script src="~/js/controllers/dashboardController.js"></script>     
+}
