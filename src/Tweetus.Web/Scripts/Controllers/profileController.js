@@ -5,9 +5,9 @@
         .module('tweetusApp')
         .controller('profileController', profileController);
 
-    profileController.$inject = ['$scope', 'dashboardService'];
+    profileController.$inject = ['$scope', 'tweetService'];
 
-    function profileController($scope, dashboardService) {
+    function profileController($scope, tweetService) {
         $scope.title = 'profileController';
         $scope.currentTweet = "";
 
@@ -18,22 +18,18 @@
             initFileUpload();
         }
 
-        $scope.postTweet = function () {
-            dashboardService.postTweet($scope.currentTweet)
-                .then(function (tweet) {
-                    addTweet(tweet);
+        $scope.likeTweet = function (tweetId) {
+            tweetService.likeTweet(tweetId)
+                .then(function (result) {
+                    
                 });
         }
 
         $scope.followUser = function () {
-            dashboardService.followUser($scope.vm.UserId)
+            tweetService.followUser($scope.vm.UserId)
                 .then(function (result) {
                     $scope.vm.ViewerAlreadyFollowing = true;
                 });
-        }
-
-        function addTweet(tweet) {
-            $scope.currentTweet = "@" + $scope.vm.UserName;
         }
 
         function initFileUpload() {

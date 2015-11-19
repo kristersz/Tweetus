@@ -7,19 +7,22 @@
         </span>
     </div>
 
-    <div class="form-group">
-        <div class="input-group" style="width: 100%">
-            <span class="input-group-btn">
-                <span class="btn btn-primary btn-file">
-                    Browse&hellip; <input type="file" name="File" id="fileUpload" />
-                </span>
-            </span>
-            <input type="text" class="form-control" readonly>
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-sm-2">
+            <button class="btn btn-primary" type="submit" ng-disabled="currentTweet.length === 0 || currentTweet.length > 169">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>  Tweet
+            </button>
         </div>
-    </div>
-
-    <button class="btn btn-primary" type="submit" ng-disabled="currentTweet.length === 0 || currentTweet.length > 169">
-        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>  Tweet
-    </button>
+        <div class="form-group col-sm-8 col-sm-offset-2">
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <span class="btn btn-primary btn-file">
+                        <span class="glyphicon glyphicon-camera"></span> Picture <input type="file" name="File" id="fileUpload" />
+                    </span>
+                </span>
+                <input type="text" class="form-control" readonly>
+            </div>
+        </div>
+    </div>       
 }
-<iframe id="uploadTarget" name="uploadTarget" height="0" width="0" frameborder="0" scrolling="yes"></iframe>  
+<iframe id="uploadTarget" name="uploadTarget" height="0" width="0" frameborder="0" scrolling="yes" style="display: none"></iframe>  

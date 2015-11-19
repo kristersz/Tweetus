@@ -15,6 +15,7 @@ using Microsoft.Data.Entity;
 using Tweetus.Web;
 using Tweetus.Web.Models;
 using Tweetus.Web.Services;
+using Tweetus.Web.Utilities.Extensions;
 
 namespace Tweetus.Web.Controllers
 {
@@ -109,25 +110,15 @@ namespace Tweetus.Web.Controllers
                 {
                     UserName = model.UserName,
                     Email = model.Email,
-                    FullName = model.FullName
+                    FullName = model.FullName,
+                    JoinedOn = DateTime.Now
                 };
 
                 if (model.ProfilePicture != null)
                 {
                     using (var reader = model.ProfilePicture.OpenReadStream())
                     {
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            int read;
-                            byte[] buffer = new byte[16 * 1024];
-
-                            while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                ms.Write(buffer, 0, read);
-                            }
-
-                            user.ProfilePicture = ms.ToArray();
-                        }
+                        user.ProfilePicture = reader.ToByteArray();
                     }
                 }                                
 
@@ -231,8 +222,17 @@ namespace Tweetus.Web.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    JoinedOn = DateTime.Now
+                };
+
                 var result = await _userManager.CreateAsync(user);
+
                 if (result.Succeeded)
                 {
                     result = await _userManager.AddLoginAsync(user, info);
@@ -242,6 +242,7 @@ namespace Tweetus.Web.Controllers
                         return RedirectToLocal(returnUrl);
                     }
                 }
+
                 AddErrors(result);
             }
 

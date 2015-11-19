@@ -62,6 +62,8 @@ namespace Tweetus.Web
             // Add MVC services to the services container.
             services.AddMvc();
 
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
@@ -70,10 +72,11 @@ namespace Tweetus.Web
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
           
-            services.AddTransient<IMongoDbRepository, MongoDbRepository>();
+            services.AddSingleton<IMongoDbRepository, MongoDbRepository>();
             services.AddTransient<TweetManager, TweetManager>();
             services.AddTransient<UserRelationshipManager, UserRelationshipManager>();
             services.AddTransient<ConversationManager, ConversationManager>();
+            services.AddTransient<NotificationManager, NotificationManager>();
         }
 
         // Configure is called after ConfigureServices is called.

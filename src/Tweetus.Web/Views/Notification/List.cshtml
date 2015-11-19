@@ -1,0 +1,66 @@
+﻿@model List<NotificationVM>
+
+@using System.Security.Claims
+@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "Notifications";
+}
+
+<div>
+    <div class="row margin-top">
+        <div class="margin-top">
+            <div class="panel panel-primary">
+                <div class="panel-heading clearfix">
+                    <h3 class="panel-title pull-left">@ViewBag.Title</h3>
+                </div>
+                <div class="panel-body">
+                    @if (Model.Count == 0)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            You have no notifications.
+                        </div>
+                    }
+                    else
+                    {
+                        <span>Show notifications <a href="#">from everyone</a> / <a href="#">from people you follow</a></span>
+                    }
+                </div>
+                <ul class="list-group" style="font-size: 1.2em">                                                        
+                    @foreach (var notif in Model)
+                    {
+                        @switch (notif.Type)
+                        {
+                            case Tweetus.Web.Data.Enums.NotificationType.Follow:
+                                <li class="list-group-item">
+                                    <div class="clearfix">
+                                        <span class="list-group-item-heading"><a href="@Url.Action("Profile", "User", new { username = notif.UserName })"><strong>@@@notif.UserName</strong></a> followed you!</span>
+                                        <span class="pull-right">@notif.CreatedOn.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                </li>
+                                break;
+                            case Tweetus.Web.Data.Enums.NotificationType.Like:
+                                <li class="list-group-item">
+                                    <div class="clearfix">
+                                        <span class="list-group-item-heading"><a href="@Url.Action("Profile", "User", new { username = "EdgeUser" })"><strong>@@@notif.UserName</strong></a> liked your tweet!</span>
+                                        <span class="pull-right">@notif.CreatedOn.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                    <div class="well well-sm margin-top clearfix">
+                                        <span>@notif.TweetContent</span>
+                                        <span class="pull-right">@notif.TweetedOn.Value.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                </li>
+                                break;
+                            case Tweetus.Web.Data.Enums.NotificationType.Retweet:
+                                break;
+                            case Tweetus.Web.Data.Enums.NotificationType.Mention:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

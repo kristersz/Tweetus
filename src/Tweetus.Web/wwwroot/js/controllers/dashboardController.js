@@ -5,9 +5,9 @@
         .module('tweetusApp')
         .controller('dashboardController', controller);
 
-    controller.$inject = ['$scope', 'dashboardService']; 
+    controller.$inject = ['$scope', 'tweetService'];
 
-    function controller($scope, dashboardService) {
+    function controller($scope, tweetService) {
         $scope.title = 'dashboardController';       
         $scope.currentTweet = "";
 
@@ -16,52 +16,34 @@
             initFileUpload();
         }
 
-        function listTweets(tweets) {
-            $scope.tweets = tweets;
+        function listTweets(result) {
+            $scope.vm.Tweets = result.Value;
         }
 
         function loadTweets() {
-            dashboardService.getTweets()
-                .then(function (tweets) {
-                    listTweets(tweets);
+            tweetService.getTweetsForDashboard()
+                .then(function (result) {
+                    listTweets(result);
                 });
-        }        
-
-        $scope.postTweet = function () {
-            dashboardService.postTweet($scope.currentTweet)
-                .then(function (tweet) {
-                    addTweet(tweet);
-                });
-        }
-
-        function addTweet(tweet) {
-            $scope.currentTweet = "";
-            $scope.vm.Tweets.push(tweet);
-
-            $("#collapseOne").collapse("hide");
         }
 
         function initFileUpload() {
             var self = this;
 
             $("#uploadTarget").load(function () {
-                //AprHelper.hideAjaxLoading();
-
-                var contents = $("#uploadTarget").contents().text();
-
-                //if (contents.indexOf("Maximum request length exceeded") >= 0) {
-                //    showMessage("Datnes izmērs nevar būt lielāks par 3 MB.");
-                //}
-
-                var data = JSON.parse(contents);
+                loadTweets();
 
                 $("#collapseOne").collapse("hide");
-
-                $scope.currentTweet = "";
                 $("#fileUpload").val("");
 
-                $scope.vm.Tweets.push(data);                
-                $scope.$apply();
+                $scope.currentTweet = "";              
+
+                var n = noty({
+                    text: 'Your tweet was successfully posted!',
+                    type: 'success',
+                    timeout: 3000,
+                    theme: 'bootstrapTheme'
+                });
             });
         }
     }

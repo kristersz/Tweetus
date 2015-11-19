@@ -7,7 +7,7 @@ namespace Tweetus.Web.ViewModels
 {
     public class TweetVM
     {
-        public long TweetId { get; set; }
+        public string TweetId { get; set; }
         public string Content { get; set; }
         public string ImageBase64 { get; set; }
         public string ImageMimeType { get; set; }

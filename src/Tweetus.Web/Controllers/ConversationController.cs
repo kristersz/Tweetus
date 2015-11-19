@@ -9,6 +9,7 @@ using Microsoft.AspNet.Mvc;
 using MongoDB.Bson;
 using Tweetus.Web.Managers;
 using Tweetus.Web.Models;
+using Tweetus.Web.Utilities.Extensions;
 using Tweetus.Web.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -36,23 +37,8 @@ namespace Tweetus.Web.Controllers
             {
                 var conversationVM = new ConversationVM();
 
-                var participatingUsers = new List<string>();
-
-                foreach (var participant in conversation.Participants)
-                {
-                    if (participant.ToString() == user.Id)
-                    {
-                        participatingUsers.Add("You");
-                    }
-                    else
-                    {
-                        var partUser = await _userManager.FindByIdAsync(participant.ToString());
-                        participatingUsers.Add(partUser.UserName);
-                    }
-                }
-
                 conversationVM.ConversationId = conversation.Id.ToString();
-                conversationVM.Name = string.Join(", ", participatingUsers);
+                conversationVM.Name = conversation.Name;
 
                 var lastMessage = conversation.Messages.OrderByDescending(m => m.SentOn).FirstOrDefault();
 
@@ -75,7 +61,7 @@ namespace Tweetus.Web.Controllers
         [HttpPost]
         public async Task<JsonResult> StartNewConversation(string username, string message)
         {
-            var result = new JsonServiceResult<bool>();
+            var result = new JsonServiceResult<ConversationVM>();
 
             try
             {
@@ -88,9 +74,29 @@ namespace Tweetus.Web.Controllers
                     return Json(result);
                 }
 
-                await _conversationManager.StartNewConversation(user.Id, recipientUser.Id, message);
+                List<Tuple<ObjectId, string>> participants = new List<Tuple<ObjectId, string>>();
 
-                result.Value = result.IsValid = true;
+                participants.Add(new Tuple<ObjectId, string>(user.Id.ToObjectId(), user.UserName));
+                participants.Add(new Tuple<ObjectId, string>(recipientUser.Id.ToObjectId(), recipientUser.UserName));
+
+                var conversation = await _conversationManager.StartNewConversation(user.Id.ToObjectId(), participants, message);
+
+                result.Value = new ConversationVM()
+                {
+                    ConversationId = conversation.Id.ToString(),
+                    Name = conversation.Name,
+                    Messages = new List<MessageVM>() {
+                        new MessageVM()
+                        {
+                            MessageId = conversation.Messages[0].Id.ToString(),
+                            Username = User.GetUserName(),
+                            Content = conversation.Messages[0].Content,
+                            SentOn = conversation.Messages[0].SentOn
+                        }
+                    }
+                };
+
+                result.IsValid = true;
             }
             catch (Exception ex)
             {
@@ -111,7 +117,7 @@ namespace Tweetus.Web.Controllers
                 var conversationVM = new ConversationVM();
 
                 conversationVM.ConversationId = conversation.Id.ToString();
-                conversationVM.Name = "ConversationName";
+                conversationVM.Name = conversation.Name;
 
                 foreach (var message in conversation.Messages)
                 {

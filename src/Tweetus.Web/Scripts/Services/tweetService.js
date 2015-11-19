@@ -3,23 +3,23 @@
 
     angular
         .module('tweetusApp')
-        .factory('dashboardService', dashboardService);
+        .factory('tweetService', tweetService);
 
-    dashboardService.$inject = ['$http', '$q'];
+    tweetService.$inject = ['$http', '$q'];
 
-    function dashboardService($http, $q) {
+    function tweetService($http, $q) {
         var service = {
-            getTweets: getTweets,
-            postTweet: postTweet,
+            getTweetsForDashboard: getTweetsForDashboard,
+            likeTweet: likeTweet,
             followUser: followUser
         };
 
         return service;
 
-        function getTweets(userId) {
+        function getTweetsForDashboard(userId) {
             var request = $http({
-                method: "get",
-                url: "GetTweets",
+                method: "post",
+                url: "/Tweet/GetTweetsForDashboard",
                 params: {
                     userId: userId
                 }
@@ -28,12 +28,12 @@
             return (request.then(handleSuccess, handleError));
         }
 
-        function postTweet(content) {
+        function likeTweet(tweetId) {
             var request = $http({
                 method: "post",
-                url: "PostTweet",
+                url: "/Tweet/LikeTweet",
                 params: {
-                    Content: content
+                    tweetId: tweetId
                 }
             });
 
@@ -43,7 +43,7 @@
         function followUser(userId) {
             var request = $http({
                 method: "post",
-                url: "FollowUser",
+                url: "/User/FollowUser",
                 params: {
                     userId: userId
                 }

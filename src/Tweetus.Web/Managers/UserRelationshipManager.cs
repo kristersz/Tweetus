@@ -44,6 +44,16 @@ namespace Tweetus.Web.Managers
                 return userFollowing.FollowingUserIds;
         }
 
+        public async Task<List<ObjectId>> GetUserFollowers(ObjectId userId)
+        {
+            var userFollowers = await _repository.UserFollows.Find(u => u.FollowingUserIds.Contains(userId)).ToListAsync();
+
+            if (userFollowers == null)
+                return new List<ObjectId>();
+            else
+                return userFollowers.Select(u => u.UserId).ToList();
+        }
+
         public async Task<bool> IsUserFollowing(ObjectId userId, ObjectId followingId)
         {
             var userIsFollowing = await _repository.UserFollows.Find(u => u.UserId == userId && u.FollowingUserIds.Contains(followingId)).FirstOrDefaultAsync();

@@ -26,9 +26,10 @@ namespace Tweetus.Web.Services.Mappers
         {
             return new TweetVM()
             {
+                TweetId = tweet.Id.ToString(),
                 Content = tweet.Content,
                 ImageBase64 = (tweet.FileContent != null) ? Convert.ToBase64String(tweet.FileContent) : string.Empty,
-                ImageMimeType = tweet.FileMimeType,
+                ImageMimeType = (tweet.FileMimeType != null) ? tweet.FileMimeType : string.Empty,
                 TweetedByUserId = user.Id,
                 TweetedByName = user.FullName,
                 TweetedByHandle = user.UserName,

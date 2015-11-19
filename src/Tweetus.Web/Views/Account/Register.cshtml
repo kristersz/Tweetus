@@ -11,49 +11,56 @@
     <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="UserName" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
+        <div class="col-md-6">
             <input asp-for="UserName" class="form-control" />
             <span asp-validation-for="UserName" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
         <label asp-for="FullName" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
+        <div class="col-md-6">
             <input asp-for="FullName" class="form-control" />
             <span asp-validation-for="FullName" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
         <label asp-for="Email" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
+        <div class="col-md-6">
             <input asp-for="Email" class="form-control" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
         <label asp-for="Password" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
+        <div class="col-md-6">
             <input asp-for="Password" class="form-control" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
         <label asp-for="ConfirmPassword" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
+        <div class="col-md-6">
             <input asp-for="ConfirmPassword" class="form-control" />
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
         <label asp-for="ProfilePicture" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="ProfilePicture" class="form-control" />
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <span class="btn btn-primary btn-file">
+                        <span class="glyphicon glyphicon-camera"></span> Picture <input asp-for="ProfilePicture" class="form-control" />
+                    </span>
+                </span>
+                <input type="text" class="form-control" readonly>
+            </div> 
             <span asp-validation-for="ProfilePicture" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <button type="submit" class="btn btn-default">Register</button>
+            <button type="submit" class="btn btn-primary">Register</button>
         </div>
     </div>
 </form>

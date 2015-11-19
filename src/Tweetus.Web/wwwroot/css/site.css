@@ -25,6 +25,19 @@ textarea {
   display: none !important;
 }
 
+[ng-cloak].splash {
+    display: block !important;
+}
+
+.splash {
+    display: none;
+}
+
+    .splash div {
+        width: 30%;
+        margin: 200px auto;
+    }
+
 .margin-top {
     margin-top: 20px;
 }

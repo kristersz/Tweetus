@@ -9,9 +9,11 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Net.Http.Headers;
 using MongoDB.Bson;
 using Tweetus.Web.Data.Documents;
+using Tweetus.Web.Data.Enums;
 using Tweetus.Web.Managers;
 using Tweetus.Web.Models;
 using Tweetus.Web.Services.Mappers;
+using Tweetus.Web.Utilities.Extensions;
 using Tweetus.Web.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,10 +23,17 @@ namespace Tweetus.Web.Controllers
     public class TweetController : BaseController
     {
         private readonly TweetManager _tweetManager;
+        private readonly UserRelationshipManager _userRelationshipManager;
+        private readonly NotificationManager _notificationManager;
 
-        public TweetController(UserManager<ApplicationUser> userManager, TweetManager tweetManager) : base(userManager)
+        public TweetController(UserManager<ApplicationUser> userManager, 
+            TweetManager tweetManager, 
+            UserRelationshipManager userRelationshipManager,
+            NotificationManager notificationManager) : base(userManager)
         {
             _tweetManager = tweetManager;
+            _userRelationshipManager = userRelationshipManager;
+            _notificationManager = notificationManager;
         }
 
         // GET: /<controller>/
@@ -33,22 +42,44 @@ namespace Tweetus.Web.Controllers
             return View();
         }
 
-        [HttpGet]
-        public async Task<JsonResult> GetTweets(string userId)
+        [HttpPost]
+        public async Task<JsonResult> GetTweetsForDashboard(string userId)
         {
-            var tweets = new List<TweetVM>();
-            var allTweets = await _tweetManager.GetTweetsByUserId(new ObjectId(User.GetUserId()));
+            var result = new JsonServiceResult<List<TweetVM>>();
 
-            if (allTweets.Count() > 0)
+            try
             {
-                foreach (var t in allTweets)
-                {
-                    var user = await _userManager.FindByIdAsync(t.UserId.ToString());
-                    tweets.Add(TweetMapper.MapTweetToViewModel(t, user));
-                }
-            }
+                var tweets = new List<TweetVM>();
 
-            return Json(tweets);
+                var user = await GetCurrentUserAsync();
+                var userObjectId = user.Id.ToObjectId();
+
+                var allUserIds = new List<ObjectId>() { userObjectId };
+                var followingUserIds = await _userRelationshipManager.GetFollowingUsers(userObjectId);
+
+                if (followingUserIds.Count > 0)
+                    allUserIds.AddRange(followingUserIds);
+
+                var allTweets = await _tweetManager.GetTweetsByUserIds(allUserIds);
+
+                if (allTweets.Count() > 0)
+                {
+                    foreach (var t in allTweets)
+                    {
+                        var tweetUser = await _userManager.FindByIdAsync(t.UserId.ToString());
+                        tweets.Add(TweetMapper.MapTweetToViewModel(t, tweetUser));
+                    }
+                }
+
+                result.Value = tweets;
+                result.IsValid = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }           
+
+            return Json(result);
         }
 
         [HttpPost]
@@ -62,7 +93,7 @@ namespace Tweetus.Web.Controllers
             var newTweet = new Tweet()
             {
                 Content = tweet.Content,
-                UserId = new ObjectId(User.GetUserId()),
+                UserId = user.Id.ToObjectId(),
                 CreatedOn = now
             };
 
@@ -81,20 +112,9 @@ namespace Tweetus.Web.Controllers
                     {
                         using (var reader = file.OpenReadStream())
                         {
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                int read;
-                                byte[] buffer = new byte[16 * 1024];
-
-                                while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
-                                {
-                                    ms.Write(buffer, 0, read);
-                                }
-
-                                newTweet.FileContent = ms.ToArray();
-                                newTweet.FileMimeType = file.ContentType;
-                                newTweet.FileOriginalName = filename;
-                            }
+                            newTweet.FileContent = reader.ToByteArray();
+                            newTweet.FileMimeType = file.ContentType;
+                            newTweet.FileOriginalName = filename;
                         }
                     }
                 }
@@ -109,13 +129,38 @@ namespace Tweetus.Web.Controllers
             viewModel.TweetedByHandle = user.UserName;
             viewModel.TweetedOn = now;
 
-            if (file != null)
-            {
-                viewModel.ImageBase64 = Convert.ToBase64String(newTweet.FileContent);
-                viewModel.ImageMimeType = file.ContentType;
-            }
+            //if (file != null)
+            //{
+            //    viewModel.ImageBase64 = Convert.ToBase64String(newTweet.FileContent);
+            //    viewModel.ImageMimeType = file.ContentType;
+            //}
 
             return Json(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> LikeTweet(string tweetId)
+        {
+            var result = new JsonServiceResult<bool>();
+
+            try
+            {
+                var currentUserObjectId = User.GetUserId().ToObjectId();
+                var tweetObjectId = tweetId.ToObjectId();
+
+                var tweet = await _tweetManager.GetTweetById(tweetObjectId);
+
+                await _tweetManager.LikeTweet(currentUserObjectId, tweetObjectId);
+                await _notificationManager.CreateNewNotification(tweet.UserId, NotificationType.Like, currentUserObjectId, tweetObjectId);
+
+                result.Value = result.IsValid = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return Json(result);
         }
     }
 }

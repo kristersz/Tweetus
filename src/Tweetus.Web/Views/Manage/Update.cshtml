@@ -1,0 +1,42 @@
+﻿@model UpdateAccountViewModel
+@{
+    ViewData["Title"] = "Update";
+}
+
+<h2>@ViewData["Title"].</h2>
+
+<form asp-controller="Manage" asp-action="Update" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+    <h4>Update your account information.</h4>
+    <hr />
+    <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="FullName" class="col-md-2 control-label"></label>
+        <div class="col-md-6">
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProfilePicture" class="col-md-2 control-label"></label>
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <span class="btn btn-primary btn-file">
+                        <span class="glyphicon glyphicon-camera"></span> Picture <input asp-for="ProfilePicture" class="form-control" />
+                    </span>
+                </span>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-6">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

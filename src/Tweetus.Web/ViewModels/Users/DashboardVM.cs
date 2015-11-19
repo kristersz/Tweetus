@@ -12,6 +12,7 @@ namespace Tweetus.Web.ViewModels
             Tweets = new List<TweetVM>();
         }
 
+        public string FullName { get; set; }
         public string ProfilePicture { get; set; }
 
         public long TweetCount { get; set; }

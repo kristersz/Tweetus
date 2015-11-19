@@ -14,5 +14,6 @@ namespace Tweetus.Web.Data
         IMongoCollection<UserFollows> UserFollows { get; }
         IMongoCollection<UserLikes> UserLikes { get; }
         IMongoCollection<Conversation> Conversations { get; }
+        IMongoCollection<UserNotifications> UserNotifications { get; }
     }
 }

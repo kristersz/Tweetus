@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
@@ -17,6 +18,11 @@ namespace Tweetus.Web.Controllers
         public BaseController(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
+        }
+
+        protected async Task<ApplicationUser> GetCurrentUserAsync()
+        {
+            return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
     }
 }

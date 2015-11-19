@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Tweetus.Web.Data;
 using Tweetus.Web.Data.Documents;
+using Tweetus.Web.Utilities.Extensions;
 using Tweetus.Web.ViewModels;
 
 namespace Tweetus.Web.Managers
@@ -18,7 +19,7 @@ namespace Tweetus.Web.Managers
 
         public async Task<Conversation> GetConversationById(string conversationId)
         {
-            var conversationObjectId = new ObjectId(conversationId);
+            var conversationObjectId = conversationId.ToObjectId();
 
             var conversation = await _repository.Conversations.Find(c => c.Id == conversationObjectId).FirstOrDefaultAsync();
 
@@ -27,39 +28,42 @@ namespace Tweetus.Web.Managers
 
         public async Task<List<Conversation>> GetUserConversations(string userId)
         {
-            var userObjectId = new ObjectId(userId);
+            var userObjectId = userId.ToObjectId();
 
             var conversations = await _repository.Conversations.Find(c => c.Participants.Contains(userObjectId)).ToListAsync();
 
             return conversations;
         }
 
-        public async Task StartNewConversation(string userIdFrom, string userIdTo, string message)
+        public async Task<Conversation> StartNewConversation(ObjectId userId, List<Tuple<ObjectId, string>> participants, string message)
         {
-            var userFromObjectId = new ObjectId(userIdFrom);
-            var userToobjectId = new ObjectId(userIdTo);
+            var participantObjetcIds = participants.Select(p => p.Item1).ToList();
+            var participantUsernames = participants.Select(p => p.Item2).ToList();
 
             var conversation = new Conversation()
             {
-                Participants = new List<ObjectId>() { userFromObjectId, userToobjectId },
+                Name = string.Join(", ", participantUsernames),
+                Participants = participantObjetcIds,
                 Messages = new List<Message>() {
                     new Message()
                     {
                         Id = ObjectId.GenerateNewId(),
                         Content = message,
-                        UserIdFrom = userFromObjectId,
+                        UserIdFrom = userId,
                         SentOn = DateTime.Now
                     }
                 }   
             };
 
             await _repository.Conversations.InsertOneAsync(conversation);
+
+            return conversation;
         }
 
         public async Task<Message> SendNewMessage(string conversationId, string userId, string message)
         {
-            var userObjectId = new ObjectId(userId);
-            var conversationObjectId = new ObjectId(conversationId);
+            var userObjectId = userId.ToObjectId();
+            var conversationObjectId = conversationId.ToObjectId();
 
             var existingConversation = await GetConversationById(conversationId);
 

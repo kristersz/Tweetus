@@ -18,7 +18,12 @@ namespace Tweetus.Web.Managers
         public async Task<Tweet> GetTweetById(ObjectId id)
         {
             return await _repository.Tweets.Find(t => t.Id == id).FirstOrDefaultAsync();
-        }        
+        }
+
+        public async Task<IList<Tweet>> GetTweetsByIds(List<ObjectId> ids)
+        {
+            return await _repository.Tweets.Find(t => ids.Contains(t.Id)).ToListAsync();
+        }
 
         public async Task<IList<Tweet>> GetTweetsByUserId(ObjectId userId)
         {
@@ -50,6 +55,39 @@ namespace Tweetus.Web.Managers
         public async Task DeleteTweet(ObjectId id)
         {
             await _repository.Tweets.DeleteOneAsync(t => t.Id == id);
+        }
+
+        public async Task LikeTweet(ObjectId userId, ObjectId tweetId)
+        {
+            var existingUserLikes = await _repository.UserLikes.Find(u => u.UserId == userId).FirstOrDefaultAsync();
+
+            if (existingUserLikes == null)
+            {
+                await _repository.UserLikes.InsertOneAsync(new UserLikes()
+                {
+                    UserId = userId,
+                    LikedTweetIds = new List<ObjectId>() { tweetId }
+                });
+            }
+            else
+            {
+                existingUserLikes.LikedTweetIds.Add(tweetId);
+                await _repository.UserLikes.ReplaceOneAsync(a => a.UserId == userId, existingUserLikes);
+            }
+        }
+
+        public async Task<IList<Tweet>> GetUserLikedTweets(ObjectId userId)
+        {
+            var userLikes = await _repository.UserLikes.Find(t => t.UserId == userId).FirstOrDefaultAsync();
+
+            if (userLikes == null)
+            {
+                return new List<Tweet>();
+            }
+            else
+            {
+                return await GetTweetsByIds(userLikes.LikedTweetIds);
+            }
         }
     }
 }

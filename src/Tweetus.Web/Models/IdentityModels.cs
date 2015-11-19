@@ -16,18 +16,17 @@ namespace Tweetus.Web.Models
     {
         public string FullName { get; set; }
         public byte[] ProfilePicture { get; set; }
+
+        public DateTime JoinedOn { get; set; }
     }
 
     public class ApplicationDbContext : MongoIdentityContext<ApplicationUser, IdentityRole>
     {
-        public ApplicationDbContext()
-        : base()
+        public ApplicationDbContext(IOptions<AppSettings> appSettings)
+            : base()
         {
-            string connectionString = "mongodb://localhost:27017";
-            string databaseName = "tweetusdb";
-
-            var client = new MongoClient(connectionString);
-            var database = client.GetDatabase(databaseName);
+            var client = new MongoClient(appSettings.Value.MongoDbConnectionString);
+            var database = client.GetDatabase(appSettings.Value.MongoDbName);
 
             this.Users = database.GetCollection<ApplicationUser>("users");
             this.Roles = database.GetCollection<IdentityRole>("roles");

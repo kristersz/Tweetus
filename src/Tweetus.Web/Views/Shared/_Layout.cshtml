@@ -38,27 +38,34 @@
                     <a asp-controller="Home" asp-action="Index" class="navbar-brand">TweetUS</a>
                 </div>
                 <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a asp-controller="User" asp-action="Dashboard"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> Dashboard</a></li>
-                        <li><a href="#"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span> Notifications</a></li>
-                        <li><a asp-controller="Conversation" asp-action="List"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Conversations</a></li>
-                    </ul>
-                    <form class="navbar-form navbar-right" role="search">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search anything">
-                        </div>
-                        <button type="submit" class="btn btn-default">Search</button>
-                    </form>                  
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <ul class="nav navbar-nav">
+                            <li><a asp-controller="User" asp-action="Dashboard"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> Dashboard</a></li>
+                            <li><a asp-controller="Notification" asp-action="List"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span> Notifications</a></li>
+                            <li><a asp-controller="Conversation" asp-action="List"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Conversations</a></li>
+                        </ul>
+                        <form class="navbar-form navbar-right" role="search">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search anything">
+                            </div>
+                            <button type="submit" class="btn btn-default">Search</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <ul class="nav navbar-nav">
+                            <li><a asp-controller="Home" asp-action="About">About</a></li>
+                            <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                        </ul>
+                    }
+
                     @await Html.PartialAsync("_LoginPartial")
                 </div>
             </div>
         </div>
         <div class="container body-content">
             @RenderBody()
-            <hr />
-            <footer>
-                <p>&copy; 2015 - Tweetus.Web</p>
-            </footer>
         </div>
 
         <environment names="Development">
@@ -70,6 +77,7 @@
             <script src="~/lib/angular/angular.js"></script>
             <script src="~/lib/angular-resource/angular-resource.js"></script>
             <script src="~/lib/angular-route/angular-route.js"></script>
+            <script src="~/lib/noty/js/noty/packaged/jquery.noty.packaged.js"></script>
         </environment>
         <environment names="Staging,Production">
             <script src="//ajax.aspnetcdn.com/ajax/jquery/jquery-2.1.4.min.js"
@@ -114,7 +122,9 @@
                     }
 
                 });
-            });
+
+                $('ul.nav > li > a[href="' + document.location.pathname + '"]').parent().addClass('active')
+            });            
         </script> 
     </body>
 </html>

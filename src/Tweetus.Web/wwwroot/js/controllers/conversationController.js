@@ -10,6 +10,7 @@
     function conversationController($scope, conversationService) {
         $scope.title = 'conversationController';
 
+        $scope.vm = [];
         $scope.recipient = "";
         $scope.message = "";
 
@@ -35,6 +36,8 @@
                 BootstrapDialog.alert(result.Message)
             }
             else {
+                $scope.vm.push(result.Value);
+
                 $('#newConversationModal').modal('hide');
 
                 $scope.recipient = "";

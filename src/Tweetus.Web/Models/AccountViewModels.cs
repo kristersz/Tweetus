@@ -15,6 +15,11 @@ namespace Tweetus.Web.Models
         public string UserName { get; set; }
 
         [Required]
+        [StringLength(255, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 3)]
+        [Display(Name = "Full name")]
+        public string FullName { get; set; }
+
+        [Required]
         [EmailAddress]
         public string Email { get; set; }
     }

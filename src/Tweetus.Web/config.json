@@ -1,6 +1,8 @@
 {
   "AppSettings": {
-    "SiteTitle": "Tweetus.Web"
+    "SiteTitle": "Tweetus.Web",
+    "MongoDbConnectionString":  "mongodb://localhost:27017",
+    "MongoDbName": "tweetusdb"
   },
   "Data": {
     "DefaultConnection": {

@@ -8,30 +8,30 @@
 }
 
 @section styles {
-    <style>
-        .margin-top {
-            margin-top: 15px;
-        }
-    </style>
 }
 
 <div ng-app="tweetusApp">
-    <img class="img-responsive" src="http://placehold.it/1170x250" />
-    <div class="row ng-cloak" style="margin-top: 20px;" ng-controller="profileController" ng-init="init(@JsonConvert.SerializeObject(Model))">
+    <div class="splash" ng-cloak>
+        <div class="alert alert-info" role="alert">
+            <img src="~/images/ajax-loader.gif" />
+            <span> Loading data...</span>
+        </div>
+    </div>
+    <div class="row margin-top ng-cloak" ng-cloak ng-controller="profileController" ng-init="init(@JsonConvert.SerializeObject(Model))">
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <img ng-src="data:image/jpeg;base64,{{vm.ProfilePicture}}" ng-show="vm.ProfilePicture.length > 0" class="img-responsive" />
-                    @*<img src="http://placehold.it/300x250" class="img-responsive img-thumbnail" />*@
+                    <img ng-src="data:image/jpeg;base64,{{vm.ProfilePicture}}" ng-show="vm.ProfilePicture.length > 0" class="img-responsive img-thumbnail" />
+                    <img src="http://placehold.it/300x250" class="img-responsive img-thumbnail"  ng-show="vm.ProfilePicture.length == 0"/>
                 </div>
                 <div class="panel-body">
-                    <a href="@Url.Action("Profile", "User", new { username = Model.UserName })"><strong>{{ vm.UserName }}</strong></a>
+                    <a href="@Url.Action("Profile", "User", new { username = Model.UserName })"><strong>{{ vm.FullName }}</strong></a>
                     @@{{ vm.UserName }}
                 </div>
                 <ul class="list-group">
                     <li class="list-group-item"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Legit dude</li>
                     <li class="list-group-item"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span><a href="http://kristerszimecs.com" target="_blank"> kristerszimecs.com</a></li>
-                    <li class="list-group-item"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Joined 2015-11-01</li>
+                    <li class="list-group-item"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Joined {{ vm.JoinedOn | date:'dd MMM yyyy' }}</li>
                 </ul>
             </div>
 
@@ -54,42 +54,87 @@
                 <ul class="nav nav-pills" role="tablist">
                     <li role="presentation" class="active"><a href="#tweets" aria-controls="tweets" role="tab" data-toggle="tab">Tweets <span class="badge">{{ vm.Tweets.length }}</span></a></li>
                     <li role="presentation"><a href="#following" aria-controls="following" role="tab" data-toggle="tab">Following <span class="badge">{{ vm.FollowingUsers.length }}</span></a></li>
-                    <li role="presentation"><a href="#followers" aria-controls="followers" role="tab" data-toggle="tab">Followers <span class="badge">100</span></a></li>
-                    <li role="presentation"><a href="#likes" aria-controls="likes" role="tab" data-toggle="tab">Likes <span class="badge">100</span></a></li>
+                    <li role="presentation"><a href="#followers" aria-controls="followers" role="tab" data-toggle="tab">Followers <span class="badge">{{ vm.Followers.length }}</span></a></li>
+                    <li role="presentation"><a href="#likes" aria-controls="likes" role="tab" data-toggle="tab">Likes <span class="badge">{{ vm.LikedTweets.length }}</span></a></li>
                 </ul>
 
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade in active margin-top" id="tweets">
+                        <div class="alert alert-warning" role="alert" ng-show="vm.Tweets.length == 0">
+                            This user has not tweeted anything.
+                        </div>
+
                         @Html.Partial("_TweetFeedPartial")
                     </div>
                     <div role="tabpanel" class="tab-pane fade margin-top" id="following">
-                        <div class="panel panel-primary" ng-repeat="user in vm.FollowingUsers">
+                        <div class="alert alert-warning" role="alert" ng-show="vm.FollowingUsers.length == 0">
+                            This user is not following anyone.
+                        </div>
+
+                        <div class="list-group">
+                            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item" ng-repeat="user in vm.FollowingUsers">
+                                <img ng-src="data:image/jpeg;base64,{{user.ProfilePictureBase64}}" ng-show="user.ProfilePictureBase64.length > 0" class="img-rounded img-responsive pull-left" style="width: 60px; height: 45px" />
+                                <img src="http://placehold.it/60x45" alt="..." class="img-rounded pull-left" ng-show="user.ProfilePictureBase64.length == 0">
+                                <div style="margin-left: 70px;">
+                                    <h4 class="list-group-item-heading">{{ user.FullName }} @@{{ user.UserName }}</h4>
+                                    <p class="list-group-item-text">{{ user.UserAbout }}</p>
+                                </div>                               
+                            </a>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade margin-top" id="followers">
+                        <div class="alert alert-warning" role="alert" ng-show="vm.Followers.length == 0">
+                            This user has no followers.
+                        </div>
+
+                        <div class="list-group">
+                            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item" ng-repeat="user in vm.Followers">
+                                <img ng-src="data:image/jpeg;base64,{{user.ProfilePictureBase64}}" ng-show="user.ProfilePictureBase64.length > 0" class="img-rounded img-responsive pull-left" style="width: 60px; height: 45px" />
+                                <img src="http://placehold.it/60x45" alt="..." class="img-rounded pull-left" ng-show="user.ProfilePictureBase64.length == 0">
+                                <div style="margin-left: 70px;">
+                                    <h4 class="list-group-item-heading">{{ user.FullName }} @@{{ user.UserName }}</h4>
+                                    <p class="list-group-item-text">{{ user.UserAbout }}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade margin-top" id="likes">
+                        <div class="alert alert-warning" role="alert" ng-show="vm.LikedTweets.length == 0">
+                            This user has not liked any tweets.
+                        </div>
+
+                        <div class="panel panel-primary" ng-repeat="tweet in vm.LikedTweets | orderBy: '-TweetedOn'">
                             <div class="panel-heading">
                                 <h3 class="panel-title">
-                                    <a ng-href="/User/Profile?username={{user.FollowingUserName}}"><strong>{{ user.FollowingUserName }}</strong></a>
-                                    @@{{ user.FollowingUserName }}
+                                    <a ng-href="/User/Profile?username={{tweet.TweetedByHandle}}"><strong>{{ tweet.TweetedByName }}</strong></a>
+                                    @@{{ tweet.TweetedByHandle }} - {{ tweet.TweetedOn | date:'dd MMM HH:mm' }}
                                 </h3>
                             </div>
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col-md-12" style="word-wrap: break-word">
-                                        <p>{{ user.FollowingUserAbout }}</p>
+                                        <p>{{ tweet.Content }}</p>
                                     </div>
                                 </div>
+
+                                <img ng-src="data:{{tweet.ImageMimeType}};base64,{{tweet.ImageBase64}}" ng-show="tweet.ImageBase64.length > 0" class="img-responsive" />
                             </div>
                             <div class="panel-footer">
                                 <button type="button" class="btn btn-default btn-sm">
-                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unfollow
+                                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Reply
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> Retweet
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm" disabled>
+                                    <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Liked
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
                                 </button>
                             </div>
                         </div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane fade" id="followers">
-                        Users that follow me
-                    </div>
-                    <div role="tabpanel" class="tab-pane fade" id="likes">
-                        Tweets that I like
                     </div>
                 </div>
             </div>           
@@ -120,6 +165,6 @@
 
 @section scripts {
     <script src="~/js/app.js"></script>
-    <script src="~/js/services/dashboardService.js"></script>
+    <script src="~/js/services/tweetService.js"></script>
     <script src="~/js/controllers/profileController.js"></script>
 }

@@ -1,13 +1,13 @@
 ﻿<div class="panel panel-primary" ng-repeat="tweet in vm.Tweets | orderBy: '-TweetedOn'">
     <div class="panel-heading">
         <h3 class="panel-title">
-            <a  ng-href="/User/Profile?username={{tweet.TweetedByName}}"><strong>{{ tweet.TweetedByName }}</strong></a>
-             @@{{ tweet.TweetedByHandle }} - {{ tweet.TweetedOn | date:'yyyy-MM-dd HH:mm:ss' }}
+            <a  ng-href="/User/Profile?username={{tweet.TweetedByHandle}}"><strong>{{ tweet.TweetedByName }}</strong></a>
+             @@{{ tweet.TweetedByHandle }} - {{ tweet.TweetedOn | date:'dd MMM HH:mm' }}
         </h3>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-12" style="word-wrap: break-word">
+            <div class="col-md-12" style="word-wrap: break-word; font-size: 1.2em">
                 <p>{{ tweet.Content }}</p>
             </div>
         </div>
@@ -21,7 +21,7 @@
         <button type="button" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> Retweet
         </button>
-        <button type="button" class="btn btn-default btn-sm">
+        <button type="button" class="btn btn-default btn-sm" ng-click="likeTweet(tweet.TweetId)">
             <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Like
         </button>
         <button type="button" class="btn btn-default btn-sm">

@@ -11,6 +11,7 @@
     "angular": "*",
     "angular-route": "*",
     "angular-resource": "*",
-    "bootstrap-dialog": "*"
+    "bootstrap-dialog": "*",
+    "noty": "*"
   }
 }

@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNet.Http;
 
 namespace Tweetus.Web.Models
 {
@@ -92,5 +93,16 @@ namespace Tweetus.Web.Models
         public string SelectedProvider { get; set; }
 
         public ICollection<SelectListItem> Providers { get; set; }
+    }
+
+    public class UpdateAccountViewModel
+    {
+        [StringLength(255, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 3)]
+        [Display(Name = "Full name")]
+        public string FullName { get; set; }
+
+        [Display(Name = "Profile picture")]
+        [FileExtensions(Extensions = "jpg,jpeg")]
+        public IFormFile ProfilePicture { get; set; }
     }
 }

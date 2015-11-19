@@ -18,6 +18,9 @@
                     </button>
                 </div>
                 <div class="panel-body">
+                    <div class="alert alert-warning" role="alert" ng-show="vm.length == 0">
+                        You have no active conversations.
+                    </div>
                     <div class="panel panel-default" ng-repeat="conversation in vm">
                         <div class="panel-heading">
                             <a class="panel-title" ng-click="openConversation(conversation.ConversationId)">{{ conversation.Name }}</a>

@@ -10,7 +10,9 @@ namespace Tweetus.Web.ViewModels
         public ProfileVM()
         {
             Tweets = new List<TweetVM>();
-            FollowingUsers = new List<FollowingUserVM>();
+            FollowingUsers = new List<UserVM>();
+            Followers = new List<UserVM>();
+            LikedTweets = new List<TweetVM>();
         }
 
         public string UserId { get; set; }
@@ -21,9 +23,15 @@ namespace Tweetus.Web.ViewModels
 
         public string ProfilePicture { get; set; }
 
+        public DateTime JoinedOn { get; set; }
+
         public List<TweetVM> Tweets { get; set; }
 
-        public List<FollowingUserVM> FollowingUsers { get; set; }
+        public List<UserVM> FollowingUsers { get; set; }
+
+        public List<UserVM> Followers { get; set; }
+
+        public List<TweetVM> LikedTweets { get; set; }
 
         public bool IsViewersProfile { get; set; }
         public bool ViewerAlreadyFollowing { get; set; }

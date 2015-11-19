@@ -11,6 +11,8 @@ using Tweetus.Web;
 using Tweetus.Web.Models;
 using Tweetus.Web.Services;
 using AspNet.Identity3.MongoDB;
+using System.IO;
+using Tweetus.Web.Utilities.Extensions;
 
 namespace Tweetus.Web.Controllers
 {
@@ -319,6 +321,47 @@ namespace Tweetus.Web.Controllers
             var result = await _userManager.AddLoginAsync(user, info);
             var message = result.Succeeded ? ManageMessageId.AddLoginSuccess : ManageMessageId.Error;
             return RedirectToAction(nameof(ManageLogins), new { Message = message });
+        }
+
+        [HttpGet]
+        public IActionResult Update()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(UpdateAccountViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await this.GetCurrentUserAsync();
+
+                if (!string.IsNullOrEmpty(model.FullName))
+                {
+                    user.FullName = model.FullName;
+                }
+
+                if (model.ProfilePicture != null)
+                {
+                    using (var reader = model.ProfilePicture.OpenReadStream())
+                    {
+                        user.ProfilePicture = reader.ToByteArray();
+                    }
+                }
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(ManageController.Index), "Manage");
+                }
+
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         #region Helpers
