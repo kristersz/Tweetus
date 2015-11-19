@@ -10,16 +10,17 @@
 <div ng-app="tweetusApp">
     <div class="splash" ng-cloak>
         <div class="alert alert-info" role="alert">
-            <img src="~/images/ajax-loader.gif" />
-            <span> Loading data...</span>
+            <span>
+                <img src="~/images/ajax-loader.gif" /> Loading data...
+            </span>
         </div>
     </div>
-    <div class="row ng-cloak margin-top" ng-cloak ng-controller="dashboardController" ng-init="init(@JsonConvert.SerializeObject(Model))">
+    <div class="row ng-cloak" ng-cloak ng-controller="dashboardController" ng-init="init(@JsonConvert.SerializeObject(Model))">
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <img ng-src="data:image/jpeg;base64,{{vm.ProfilePicture}}" ng-show="vm.ProfilePicture.length > 0" class="img-responsive img-thumbnail" />
-                    <img src="http://placehold.it/230x65" class="img-responsive img-thumbnail" ng-show="vm.ProfilePicture.length == 0" />
+                    <img src="http://placehold.it/230x100" class="img-responsive img-thumbnail" ng-show="vm.ProfilePicture.length == 0" />
                 </div>
                 <div class="panel-body">
                     <a href="@Url.Action("Profile", "User", new { username = User.GetUserName() })"><strong>{{ vm.FullName }}</strong></a>
@@ -36,11 +37,11 @@
         <div class="col-md-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <a role="button" data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color: white">
+                    <a role="button" data-toggle="collapse" href="#collapseMainTweet" aria-expanded="true" aria-controls="collapseMainTweet" style="color: white">
                         What is happening? Tweet now!
                     </a>
                 </div>
-                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div id="collapseMainTweet" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-12">
@@ -52,6 +53,13 @@
             </div>
 
             <hr />
+
+            <div class="alert alert-warning" role="alert" ng-show="vm.Tweets.length == 0">
+                <p>Your tweet feed is currently empty, consider following some new people!</p>
+                <div class="margin-top">
+                    <a asp-controller="User" asp-action="Search" role="button" class="btn btn-primary">Search users</a>
+                </div>               
+            </div>
 
             @Html.Partial("_TweetFeedPartial")
         </div>

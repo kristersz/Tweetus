@@ -342,6 +342,16 @@ namespace Tweetus.Web.Controllers
                     user.FullName = model.FullName;
                 }
 
+                if (!string.IsNullOrEmpty(model.About))
+                {
+                    user.About = model.About;
+                }
+
+                if (!string.IsNullOrEmpty(model.Website))
+                {
+                    user.Website = model.Website;
+                }
+
                 if (model.ProfilePicture != null)
                 {
                     using (var reader = model.ProfilePicture.OpenReadStream())

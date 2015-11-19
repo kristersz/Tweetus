@@ -15,17 +15,22 @@
         <img ng-src="data:{{tweet.ImageMimeType}};base64,{{tweet.ImageBase64}}" ng-show="tweet.ImageBase64.length > 0" class="img-responsive" />
     </div>
     <div class="panel-footer">
+        <a role="button" class="btn btn-default btn-sm" data-toggle="collapse" ng-href="#{{ tweet.TweetId }}">
+            <span class="glyphicon glyphicon-comment"></span> Reply
+        </a>
         <button type="button" class="btn btn-default btn-sm">
-            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Reply
-        </button>
-        <button type="button" class="btn btn-default btn-sm">
-            <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> Retweet
+            <span class="glyphicon glyphicon-retweet"></span> Retweet
         </button>
         <button type="button" class="btn btn-default btn-sm" ng-click="likeTweet(tweet.TweetId)">
-            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Like
+            <span class="glyphicon glyphicon-heart"></span> Like
         </button>
         <button type="button" class="btn btn-default btn-sm">
-            <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
+            <span class="glyphicon glyphicon-share"></span> Share
         </button>
     </div>
+    <div ng-attr-id="{{ tweet.TweetId }}" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+            @Html.Partial("_PostTweetPartial")
+        </div>
+    </div>   
 </div>

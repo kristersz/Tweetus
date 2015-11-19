@@ -91,6 +91,8 @@ namespace Tweetus.Web.Controllers
             viewModel.UserName = user.UserName;
             viewModel.FullName = user.FullName;
             viewModel.JoinedOn = user.JoinedOn;
+            viewModel.About = user.About;
+            viewModel.Website = user.Website;
 
             if (user.ProfilePicture != null)
             {
@@ -150,6 +152,47 @@ namespace Tweetus.Web.Controllers
                 viewModel.LikedTweets.AddRange(TweetMapper.MapTweetsToViewModels(likedTweets, user));
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult Search()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> SearchUsers(string searchParam)
+        {
+            var result = new JsonServiceResult<List<UserVM>>();
+
+            if (string.IsNullOrEmpty(searchParam))
+                return Json(result);
+
+            try
+            {
+                var user = await _userManager.FindByNameAsync(searchParam.ToUpper());
+
+                if (user != null)
+                {
+                    var vm = new UserVM()
+                    {
+                        UserId = user.Id,
+                        UserName = user.UserName,
+                        FullName = user.FullName,
+                        UserAbout = "BLANK",
+                        ProfilePictureBase64 = (user.ProfilePicture != null) ? Convert.ToBase64String(user.ProfilePicture) : string.Empty
+                    };
+
+                    result.Value = new List<UserVM>() { vm };
+                    result.IsValid = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return Json(result);
         }
 
         [HttpPost]

@@ -101,6 +101,14 @@ namespace Tweetus.Web.Models
         [Display(Name = "Full name")]
         public string FullName { get; set; }
 
+        [StringLength(1024, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 3)]
+        [Display(Name = "About")]
+        public string About { get; set; }
+
+        [Display(Name = "Website")]
+        [DataType(DataType.Url)]
+        public string Website { get; set; }
+
         [Display(Name = "Profile picture")]
         [FileExtensions(Extensions = "jpg,jpeg")]
         public IFormFile ProfilePicture { get; set; }

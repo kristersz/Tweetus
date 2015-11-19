@@ -15,8 +15,9 @@ namespace Tweetus.Web.Models
     public class ApplicationUser : IdentityUser
     {
         public string FullName { get; set; }
+        public string About { get; set; }
+        public string Website { get; set; }
         public byte[] ProfilePicture { get; set; }
-
         public DateTime JoinedOn { get; set; }
     }
 

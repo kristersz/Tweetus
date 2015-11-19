@@ -13,6 +13,7 @@ namespace Tweetus.Web.ViewModels
             FollowingUsers = new List<UserVM>();
             Followers = new List<UserVM>();
             LikedTweets = new List<TweetVM>();
+            ProfilePicture = string.Empty;
         }
 
         public string UserId { get; set; }
@@ -20,6 +21,10 @@ namespace Tweetus.Web.ViewModels
         public string UserName { get; set; }
 
         public string FullName { get; set; }
+
+        public string About { get; set; }
+
+        public string Website { get; set; }
 
         public string ProfilePicture { get; set; }
 

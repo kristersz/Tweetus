@@ -10,8 +10,7 @@
     function tweetService($http, $q) {
         var service = {
             getTweetsForDashboard: getTweetsForDashboard,
-            likeTweet: likeTweet,
-            followUser: followUser
+            likeTweet: likeTweet
         };
 
         return service;
@@ -34,18 +33,6 @@
                 url: "/Tweet/LikeTweet",
                 params: {
                     tweetId: tweetId
-                }
-            });
-
-            return (request.then(handleSuccess, handleError));
-        }
-
-        function followUser(userId) {
-            var request = $http({
-                method: "post",
-                url: "/User/FollowUser",
-                params: {
-                    userId: userId
                 }
             });
 

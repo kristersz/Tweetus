@@ -33,7 +33,7 @@
             $("#uploadTarget").load(function () {
                 loadTweets();
 
-                $("#collapseOne").collapse("hide");
+                $("#collapseMainTweet").collapse("hide");
                 $("#fileUpload").val("");
 
                 $scope.currentTweet = "";              

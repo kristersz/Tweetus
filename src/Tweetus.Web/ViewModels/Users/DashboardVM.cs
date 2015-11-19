@@ -10,6 +10,7 @@ namespace Tweetus.Web.ViewModels
         public DashboardVM()
         {
             Tweets = new List<TweetVM>();
+            ProfilePicture = string.Empty;
         }
 
         public string FullName { get; set; }

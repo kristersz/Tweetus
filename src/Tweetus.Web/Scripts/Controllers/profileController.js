@@ -5,9 +5,9 @@
         .module('tweetusApp')
         .controller('profileController', profileController);
 
-    profileController.$inject = ['$scope', 'tweetService'];
+    profileController.$inject = ['$scope', 'tweetService', 'userService'];
 
-    function profileController($scope, tweetService) {
+    function profileController($scope, tweetService, userService) {
         $scope.title = 'profileController';
         $scope.currentTweet = "";
 
@@ -26,7 +26,7 @@
         }
 
         $scope.followUser = function () {
-            tweetService.followUser($scope.vm.UserId)
+            userService.followUser($scope.vm.UserId)
                 .then(function (result) {
                     $scope.vm.ViewerAlreadyFollowing = true;
                 });
@@ -42,6 +42,13 @@
                 $("#fileUpload").val("");
 
                 $scope.$apply();
+
+                var n = noty({
+                    text: 'Your tweet was successfully posted!',
+                    type: 'success',
+                    timeout: 3000,
+                    theme: 'bootstrapTheme'
+                });
             });
         }
     }

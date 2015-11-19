@@ -112,15 +112,7 @@ namespace Tweetus.Web.Controllers
                     Email = model.Email,
                     FullName = model.FullName,
                     JoinedOn = DateTime.Now
-                };
-
-                if (model.ProfilePicture != null)
-                {
-                    using (var reader = model.ProfilePicture.OpenReadStream())
-                    {
-                        user.ProfilePicture = reader.ToByteArray();
-                    }
-                }                                
+                };                            
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -133,7 +125,7 @@ namespace Tweetus.Web.Controllers
                     //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                     //    "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction(nameof(HomeController.Index), "Home");
+                    return RedirectToAction(nameof(UserController.Dashboard), "User");
                 }
 
                 AddErrors(result);
@@ -236,6 +228,7 @@ namespace Tweetus.Web.Controllers
                 if (result.Succeeded)
                 {
                     result = await _userManager.AddLoginAsync(user, info);
+
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);

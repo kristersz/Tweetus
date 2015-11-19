@@ -12,12 +12,13 @@
 
 <div ng-app="tweetusApp">
     <div class="splash" ng-cloak>
-        <div class="alert alert-info" role="alert">
-            <img src="~/images/ajax-loader.gif" />
-            <span> Loading data...</span>
+        <div class="alert alert-info" role="alert">          
+            <span>
+                <img src="~/images/ajax-loader.gif" /> Loading data...
+            </span>
         </div>
     </div>
-    <div class="row margin-top ng-cloak" ng-cloak ng-controller="profileController" ng-init="init(@JsonConvert.SerializeObject(Model))">
+    <div class="row ng-cloak" ng-cloak ng-controller="profileController" ng-init="init(@JsonConvert.SerializeObject(Model))">
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -29,8 +30,8 @@
                     @@{{ vm.UserName }}
                 </div>
                 <ul class="list-group">
-                    <li class="list-group-item"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Legit dude</li>
-                    <li class="list-group-item"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span><a href="http://kristerszimecs.com" target="_blank"> kristerszimecs.com</a></li>
+                    <li class="list-group-item" ng-show="vm.About"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> {{ vm.About }}</li>
+                    <li class="list-group-item" ng-show="vm.Website"><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span><a href="@Model.Website" target="_blank"> {{ vm.Website }}</a></li>
                     <li class="list-group-item"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Joined {{ vm.JoinedOn | date:'dd MMM yyyy' }}</li>
                 </ul>
             </div>
@@ -166,5 +167,6 @@
 @section scripts {
     <script src="~/js/app.js"></script>
     <script src="~/js/services/tweetService.js"></script>
+    <script src="~/js/services/userService.js"></script>
     <script src="~/js/controllers/profileController.js"></script>
 }
