@@ -65,6 +65,10 @@ textarea {
     display: block;
 }
 
+.user-tile {
+    min-height: 65px;
+}
+
 input[readonly] {
     background-color: white !important;
     cursor: text !important;

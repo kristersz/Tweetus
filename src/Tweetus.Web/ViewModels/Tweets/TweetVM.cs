@@ -12,8 +12,12 @@ namespace Tweetus.Web.ViewModels
         public string ImageBase64 { get; set; }
         public string ImageMimeType { get; set; }
         public string TweetedByUserId { get; set; }        
-        public string TweetedByName { get; set; }
-        public string TweetedByHandle { get; set; }
+        public string TweetedByFullName { get; set; }
+        public string TweetedByUserName { get; set; }
         public DateTime TweetedOn { get; set; }
+        public string RetweetedFromUserName { get; set; }
+
+        public bool CanRetweet { get; set; }
+        public bool CurrentUserAlreadyLiked { get; set; }
     }
 }

@@ -42,7 +42,7 @@
                             case Tweetus.Web.Data.Enums.NotificationType.Like:
                                 <li class="list-group-item">
                                     <div class="clearfix">
-                                        <span class="list-group-item-heading"><a href="@Url.Action("Profile", "User", new { username = "EdgeUser" })"><strong>@@@notif.UserName</strong></a> liked your tweet!</span>
+                                        <span class="list-group-item-heading"><a href="@Url.Action("Profile", "User", new { username = notif.UserName })"><strong>@@@notif.UserName</strong></a> liked your tweet!</span>
                                         <span class="pull-right">@notif.CreatedOn.ToString("dd MMM HH:ss")</span>
                                     </div>
                                     <div class="well well-sm margin-top clearfix">
@@ -52,8 +52,28 @@
                                 </li>
                                 break;
                             case Tweetus.Web.Data.Enums.NotificationType.Retweet:
+                                <li class="list-group-item">
+                                    <div class="clearfix">
+                                        <span class="list-group-item-heading"><a href="@Url.Action("Profile", "User", new { username = notif.UserName })"><strong>@@@notif.UserName</strong></a> retweeted your tweet!</span>
+                                        <span class="pull-right">@notif.CreatedOn.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                    <div class="well well-sm margin-top clearfix">
+                                        <span>@notif.TweetContent</span>
+                                        <span class="pull-right">@notif.TweetedOn.Value.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                </li>
                                 break;
                             case Tweetus.Web.Data.Enums.NotificationType.Mention:
+                                <li class="list-group-item">
+                                    <div class="clearfix">
+                                        <span class="list-group-item-heading"><a href="@Url.Action("Profile", "User", new { username = notif.UserName })"><strong>@@@notif.UserName</strong></a> mentioned you in their tweet!</span>
+                                        <span class="pull-right">@notif.CreatedOn.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                    <div class="well well-sm margin-top clearfix">
+                                        <span>@notif.TweetContent</span>
+                                        <span class="pull-right">@notif.TweetedOn.Value.ToString("dd MMM HH:ss")</span>
+                                    </div>
+                                </li>
                                 break;
                             default:
                                 break;

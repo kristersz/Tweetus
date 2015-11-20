@@ -27,6 +27,12 @@ namespace Tweetus.Web.Data.Documents
         [BsonElement("filename")]
         public string FileOriginalName { get; set; }
 
+        [BsonElement("retweeted_from_id")]
+        public ObjectId RetweetedFromId { get; set; }
+
+        [BsonElement("retweeted_from_username")]
+        public string RetweetedFromUserName { get; set; }
+
         [BsonElement("created_on")]
         public DateTime CreatedOn { get; set; }
     }

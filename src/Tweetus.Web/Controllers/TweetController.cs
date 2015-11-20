@@ -13,6 +13,7 @@ using Tweetus.Web.Data.Enums;
 using Tweetus.Web.Managers;
 using Tweetus.Web.Models;
 using Tweetus.Web.Services.Mappers;
+using Tweetus.Web.Utilities;
 using Tweetus.Web.Utilities.Extensions;
 using Tweetus.Web.ViewModels;
 
@@ -69,6 +70,14 @@ namespace Tweetus.Web.Controllers
                         var tweetUser = await _userManager.FindByIdAsync(t.UserId.ToString());
                         tweets.Add(TweetMapper.MapTweetToViewModel(t, tweetUser));
                     }
+
+                    var currentUserLikedTweets = await _tweetManager.GetUserLikedTweets(userObjectId);
+
+                    foreach (var tweet in tweets)
+                    {
+                        tweet.CanRetweet = tweet.TweetedByUserId != user.Id;
+                        tweet.CurrentUserAlreadyLiked = currentUserLikedTweets.Any(t => t.Id == tweet.TweetId.ToObjectId());
+                    }
                 }
 
                 result.Value = tweets;
@@ -86,7 +95,7 @@ namespace Tweetus.Web.Controllers
         [Produces("text/plain")]
         public async Task<JsonResult> PostTweet(PostTweetVM tweet)
         {
-            var user = await _userManager.FindByIdAsync(User.GetUserId());
+            var user = await GetCurrentUserAsync();
             var now = DateTime.Now;
             var file = tweet.File;
 
@@ -122,18 +131,24 @@ namespace Tweetus.Web.Controllers
 
             await _tweetManager.CreateTweet(newTweet);
 
+            var mentionedUserNames = TweetUtils.ExtractUserMentions(tweet.Content);
+
+            foreach (var mentionedUserName in mentionedUserNames)
+            {
+                var mentionedUser = await _userManager.FindByNameAsync(mentionedUserName.ToUpper());
+
+                if (mentionedUser != null)
+                {
+                    await _notificationManager.CreateNewNotification(mentionedUser.Id.ToObjectId(), NotificationType.Mention, user.Id.ToObjectId(), newTweet.Id);
+                }               
+            }
+
             var viewModel = new TweetVM();
 
             viewModel.Content = tweet.Content;
-            viewModel.TweetedByName = user.FullName;
-            viewModel.TweetedByHandle = user.UserName;
+            viewModel.TweetedByFullName = user.FullName;
+            viewModel.TweetedByUserName = user.UserName;
             viewModel.TweetedOn = now;
-
-            //if (file != null)
-            //{
-            //    viewModel.ImageBase64 = Convert.ToBase64String(newTweet.FileContent);
-            //    viewModel.ImageMimeType = file.ContentType;
-            //}
 
             return Json(viewModel);
         }
@@ -152,6 +167,42 @@ namespace Tweetus.Web.Controllers
 
                 await _tweetManager.LikeTweet(currentUserObjectId, tweetObjectId);
                 await _notificationManager.CreateNewNotification(tweet.UserId, NotificationType.Like, currentUserObjectId, tweetObjectId);
+
+                result.Value = result.IsValid = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Retweet(string tweetId)
+        {
+            var result = new JsonServiceResult<bool>();
+
+            try
+            {
+                var currentUserObjectId = User.GetUserId().ToObjectId();
+                var tweetObjectId = tweetId.ToObjectId();
+
+                var originalTweet = await _tweetManager.GetTweetById(tweetObjectId);
+                var originalTweetUser = await _userManager.FindByIdAsync(originalTweet.UserId.ToString());
+
+                await _tweetManager.CreateTweet(new Tweet() {
+                    Content = originalTweet.Content,
+                    UserId = currentUserObjectId,
+                    FileContent = originalTweet.FileContent,
+                    FileMimeType = originalTweet.FileMimeType,
+                    FileOriginalName = originalTweet.FileOriginalName,
+                    CreatedOn = DateTime.Now,
+                    RetweetedFromId = originalTweet.Id,
+                    RetweetedFromUserName = originalTweetUser.UserName
+                });
+
+                await _notificationManager.CreateNewNotification(originalTweet.UserId, NotificationType.Retweet, currentUserObjectId, tweetObjectId);
 
                 result.Value = result.IsValid = true;
             }

@@ -38,7 +38,7 @@ namespace Tweetus.Web.ViewModels
 
         public List<TweetVM> LikedTweets { get; set; }
 
-        public bool IsViewersProfile { get; set; }
-        public bool ViewerAlreadyFollowing { get; set; }
+        public bool IsCurrentUsersProfile { get; set; }
+        public bool CurrentUserAlreadyFollowing { get; set; }
     }
 }

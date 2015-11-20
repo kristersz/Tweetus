@@ -47,7 +47,7 @@ namespace Tweetus.Web.Controllers
                     vm.UserName = user.UserName;
                     vm.CreatedOn = notification.CreatedOn;
 
-                    if (vm.Type == NotificationType.Like)
+                    if (vm.Type != NotificationType.Follow)
                     {
                         var tweet = await _tweetManager.GetTweetById(notification.TweetId);
 

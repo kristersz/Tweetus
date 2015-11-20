@@ -10,7 +10,8 @@
     function tweetService($http, $q) {
         var service = {
             getTweetsForDashboard: getTweetsForDashboard,
-            likeTweet: likeTweet
+            likeTweet: likeTweet,
+            retweet: retweet
         };
 
         return service;
@@ -31,6 +32,18 @@
             var request = $http({
                 method: "post",
                 url: "/Tweet/LikeTweet",
+                params: {
+                    tweetId: tweetId
+                }
+            });
+
+            return (request.then(handleSuccess, handleError));
+        }
+
+        function retweet(tweetId) {
+            var request = $http({
+                method: "post",
+                url: "/Tweet/Retweet",
                 params: {
                     tweetId: tweetId
                 }

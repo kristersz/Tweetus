@@ -18,17 +18,28 @@
             initFileUpload();
         }
 
-        $scope.likeTweet = function (tweetId) {
-            tweetService.likeTweet(tweetId)
+        $scope.likeTweet = function (tweet) {
+            tweetService.likeTweet(tweet.TweetId)
                 .then(function (result) {
-                    
+                    proccessLikedTweet(result, tweet);
                 });
+        }
+
+        $scope.openReply = function (tweet) {
+            $scope.currentTweet = "@" + tweet.TweetedByUserName;
+            $("#" + tweet.TweetId).collapse("show");
+        }
+
+        function proccessLikedTweet(result, tweet) {
+            if (result.IsValid) {
+                tweet.CurrentUserAlreadyLiked = true;
+            }            
         }
 
         $scope.followUser = function () {
             userService.followUser($scope.vm.UserId)
                 .then(function (result) {
-                    $scope.vm.ViewerAlreadyFollowing = true;
+                    $scope.vm.CurrentUserAlreadyFollowing = true;
                 });
         }
 
@@ -37,6 +48,7 @@
 
             $("#uploadTarget").load(function () {
                 $('#tweetToUserModal').modal('hide');
+                $(".panel-collapse").collapse("hide");
 
                 $scope.currentTweet = "@" + $scope.vm.UserName;
                 $("#fileUpload").val("");

@@ -16,6 +16,37 @@
             initFileUpload();
         }
 
+        $scope.likeTweet = function (tweet) {
+            tweetService.likeTweet(tweet.TweetId)
+                .then(function (result) {
+                    proccessLikedTweet(result, tweet);
+                });
+        }
+
+        $scope.openReply = function(tweet) {
+            $scope.currentTweet = "@" + tweet.TweetedByUserName;
+            $("#" + tweet.TweetId).collapse("show");
+        }
+
+        $scope.retweet = function (tweet) {
+            tweetService.retweet(tweet.TweetId)
+                .then(function (result) {
+                    proccessRetweet(result, tweet);
+                });
+        }
+
+        function proccessLikedTweet(result, tweet) {
+            if (result.IsValid) {
+                tweet.CurrentUserAlreadyLiked = true;
+            }
+        }
+
+        function proccessRetweet(result, tweet) {
+            if (result.IsValid) {
+                loadTweets();
+            }
+        }
+
         function listTweets(result) {
             $scope.vm.Tweets = result.Value;
         }

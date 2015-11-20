@@ -63,6 +63,14 @@ namespace Tweetus.Web.Controllers
                     var tweetUser = await _userManager.FindByIdAsync(t.UserId.ToString());
                     viewModel.Tweets.Add(TweetMapper.MapTweetToViewModel(t, tweetUser));
                 }
+
+                var currentUserLikedTweets = await _tweetManager.GetUserLikedTweets(userObjectId);
+
+                foreach (var tweet in viewModel.Tweets)
+                {
+                    tweet.CanRetweet = tweet.TweetedByUserId != user.Id;
+                    tweet.CurrentUserAlreadyLiked = currentUserLikedTweets.Any(t => t.Id == tweet.TweetId.ToObjectId());
+                }
             }
 
             viewModel.FullName = user.FullName;
@@ -81,34 +89,51 @@ namespace Tweetus.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile(string username)
         {
+            if (string.IsNullOrEmpty(username))
+                return RedirectToAction("Error", "Home"); 
+
+            var profileOwner = await _userManager.FindByNameAsync(username.ToUpper());
+
+            if (profileOwner == null)
+                return RedirectToAction("Error", "Home");
+
             var viewModel = new ProfileVM();
 
-            var normalizedUsername = username.ToUpper();
-            var user = await _userManager.FindByNameAsync(normalizedUsername);
-            var userObjectId = user.Id.ToObjectId();
+            var currentUserId = User.GetUserId();
+            var profileOwnerObjectId = profileOwner.Id.ToObjectId();
 
-            viewModel.UserId = user.Id;
-            viewModel.UserName = user.UserName;
-            viewModel.FullName = user.FullName;
-            viewModel.JoinedOn = user.JoinedOn;
-            viewModel.About = user.About;
-            viewModel.Website = user.Website;
+            // map user fields
+            viewModel.UserId = profileOwner.Id;
+            viewModel.UserName = profileOwner.UserName;
+            viewModel.FullName = profileOwner.FullName;
+            viewModel.JoinedOn = profileOwner.JoinedOn;
+            viewModel.About = profileOwner.About;
+            viewModel.Website = profileOwner.Website;
 
-            if (user.ProfilePicture != null)
-            {
-                viewModel.ProfilePicture = Convert.ToBase64String(user.ProfilePicture);
-            }
-            
+            if (profileOwner.ProfilePicture != null)
+                viewModel.ProfilePicture = Convert.ToBase64String(profileOwner.ProfilePicture);         
 
-            viewModel.IsViewersProfile = User.GetUserId() == user.Id;
-            viewModel.ViewerAlreadyFollowing = await _userRelationshipManager.IsUserFollowing(User.GetUserId().ToObjectId(), userObjectId);
+            viewModel.IsCurrentUsersProfile = currentUserId == profileOwner.Id;
+            viewModel.CurrentUserAlreadyFollowing = await _userRelationshipManager.IsUserFollowing(User.GetUserId().ToObjectId(), profileOwnerObjectId);
 
-            var allTweets = await _tweetManager.GetTweetsByUserId(userObjectId);
+            // get users tweets
+            var allTweets = await _tweetManager.GetTweetsByUserId(profileOwnerObjectId);
 
             if (allTweets.Count() > 0)
-                viewModel.Tweets.AddRange(TweetMapper.MapTweetsToViewModels(allTweets, user));
+            {
+                viewModel.Tweets.AddRange(TweetMapper.MapTweetsToViewModels(allTweets, profileOwner));
 
-            var followingUserIds = await _userRelationshipManager.GetFollowingUsers(userObjectId);
+                var currentUserLikedTweets = await _tweetManager.GetUserLikedTweets(currentUserId.ToObjectId());
+
+                foreach (var tweet in viewModel.Tweets)
+                {
+                    tweet.CanRetweet = !viewModel.IsCurrentUsersProfile;
+                    tweet.CurrentUserAlreadyLiked = currentUserLikedTweets.Any(t => t.Id == tweet.TweetId.ToObjectId());
+                }
+            }
+
+            // get the people that this user is following
+            var followingUserIds = await _userRelationshipManager.GetFollowingUsers(profileOwnerObjectId);
 
             if (followingUserIds.Count > 0)
             {
@@ -116,18 +141,12 @@ namespace Tweetus.Web.Controllers
                 {
                     var followingUser = await _userManager.FindByIdAsync(followingUserId.ToString());
 
-                    viewModel.FollowingUsers.Add(new UserVM()
-                    {
-                        UserId = followingUser.Id,
-                        UserName = followingUser.UserName,
-                        FullName = followingUser.FullName,
-                        UserAbout = "BLANK",
-                        ProfilePictureBase64 = (followingUser.ProfilePicture != null) ? Convert.ToBase64String(followingUser.ProfilePicture) : string.Empty
-                    });
+                    viewModel.FollowingUsers.Add(UserMapper.MapUserToViewModel(followingUser));
                 }
             }
 
-            var followerUserIds = await _userRelationshipManager.GetUserFollowers(userObjectId);
+            // get users followers
+            var followerUserIds = await _userRelationshipManager.GetUserFollowers(profileOwnerObjectId);
 
             if (followerUserIds.Count > 0)
             {
@@ -135,21 +154,22 @@ namespace Tweetus.Web.Controllers
                 {
                     var follower = await _userManager.FindByIdAsync(followerUserId.ToString());
 
-                    viewModel.Followers.Add(new UserVM()
-                    {
-                        UserId = follower.Id,
-                        UserName = follower.UserName,
-                        FullName = follower.FullName,
-                        UserAbout = "BLANK",
-                        ProfilePictureBase64 = (follower.ProfilePicture != null) ? Convert.ToBase64String(follower.ProfilePicture) : string.Empty
-                    });
+                    viewModel.Followers.Add(UserMapper.MapUserToViewModel(follower));
                 }
             }
 
-            var likedTweets = await _tweetManager.GetUserLikedTweets(userObjectId);
+            // get the tweets that this user liked
+            var likedTweets = await _tweetManager.GetUserLikedTweets(profileOwnerObjectId);
 
             if (likedTweets.Count() > 0)
-                viewModel.LikedTweets.AddRange(TweetMapper.MapTweetsToViewModels(likedTweets, user));
+            {
+                foreach (var likedTweet in likedTweets)
+                {
+                    var likedTweetUser = await _userManager.FindByIdAsync(likedTweet.UserId.ToString());
+
+                    viewModel.LikedTweets.Add(TweetMapper.MapTweetToViewModel(likedTweet, likedTweetUser));
+                }
+            }
 
             return View(viewModel);
         }
@@ -174,14 +194,7 @@ namespace Tweetus.Web.Controllers
 
                 if (user != null)
                 {
-                    var vm = new UserVM()
-                    {
-                        UserId = user.Id,
-                        UserName = user.UserName,
-                        FullName = user.FullName,
-                        UserAbout = "BLANK",
-                        ProfilePictureBase64 = (user.ProfilePicture != null) ? Convert.ToBase64String(user.ProfilePicture) : string.Empty
-                    };
+                    var vm = UserMapper.MapUserToViewModel(user);
 
                     result.Value = new List<UserVM>() { vm };
                     result.IsValid = true;

@@ -31,9 +31,10 @@ namespace Tweetus.Web.Services.Mappers
                 ImageBase64 = (tweet.FileContent != null) ? Convert.ToBase64String(tweet.FileContent) : string.Empty,
                 ImageMimeType = (tweet.FileMimeType != null) ? tweet.FileMimeType : string.Empty,
                 TweetedByUserId = user.Id,
-                TweetedByName = user.FullName,
-                TweetedByHandle = user.UserName,
-                TweetedOn = tweet.CreatedOn
+                TweetedByFullName = user.FullName,
+                TweetedByUserName = user.UserName,
+                TweetedOn = tweet.CreatedOn,
+                RetweetedFromUserName = tweet.RetweetedFromUserName
             };
         }
     }

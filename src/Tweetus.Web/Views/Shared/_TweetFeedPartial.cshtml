@@ -1,8 +1,9 @@
 ﻿<div class="panel panel-primary" ng-repeat="tweet in vm.Tweets | orderBy: '-TweetedOn'">
     <div class="panel-heading">
         <h3 class="panel-title">
-            <a  ng-href="/User/Profile?username={{tweet.TweetedByHandle}}"><strong>{{ tweet.TweetedByName }}</strong></a>
-             @@{{ tweet.TweetedByHandle }} - {{ tweet.TweetedOn | date:'dd MMM HH:mm' }}
+            <a  ng-href="/User/Profile?username={{tweet.TweetedByUserName}}"><strong>{{ tweet.TweetedByFullName }}</strong></a>
+             @@{{ tweet.TweetedByUserName }} - {{ tweet.TweetedOn | date:'dd MMM HH:mm' }}
+            <span class="label label-success" ng-show="tweet.RetweetedFromUserName">Retweeted from {{ tweet.RetweetedFromUserName }}</span>
         </h3>
     </div>
     <div class="panel-body">
@@ -15,17 +16,16 @@
         <img ng-src="data:{{tweet.ImageMimeType}};base64,{{tweet.ImageBase64}}" ng-show="tweet.ImageBase64.length > 0" class="img-responsive" />
     </div>
     <div class="panel-footer">
-        <a role="button" class="btn btn-default btn-sm" data-toggle="collapse" ng-href="#{{ tweet.TweetId }}">
+        <button type="button" class="btn btn-default btn-sm" ng-click="openReply(tweet)">
             <span class="glyphicon glyphicon-comment"></span> Reply
-        </a>
-        <button type="button" class="btn btn-default btn-sm">
+        </button>
+        <button type="button" class="btn btn-default btn-sm" ng-disabled="!tweet.CanRetweet" ng-click="retweet(tweet)">
             <span class="glyphicon glyphicon-retweet"></span> Retweet
         </button>
-        <button type="button" class="btn btn-default btn-sm" ng-click="likeTweet(tweet.TweetId)">
-            <span class="glyphicon glyphicon-heart"></span> Like
-        </button>
-        <button type="button" class="btn btn-default btn-sm">
-            <span class="glyphicon glyphicon-share"></span> Share
+        <button type="button" class="btn btn-default btn-sm" ng-click="likeTweet(tweet)" ng-disabled="tweet.CurrentUserAlreadyLiked">
+            <span class="glyphicon glyphicon-heart"></span> 
+            <span ng-show="!tweet.CurrentUserAlreadyLiked">Like</span> 
+            <span ng-show="tweet.CurrentUserAlreadyLiked">Liked</span>
         </button>
     </div>
     <div ng-attr-id="{{ tweet.TweetId }}" class="panel-collapse collapse" role="tabpanel">

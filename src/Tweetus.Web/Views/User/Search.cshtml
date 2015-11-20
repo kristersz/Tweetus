@@ -15,7 +15,7 @@
             <div class="alert alert-warning" role="alert" ng-show="userHasSearched && result.length == 0">
                 No results were found.
             </div>
-            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item" ng-repeat="user in result">
+            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item user-tile" ng-repeat="user in result">
                 <img ng-src="data:image/jpeg;base64,{{user.ProfilePictureBase64}}" ng-show="user.ProfilePictureBase64.length > 0" class="img-rounded img-responsive pull-left" style="width: 60px; height: 45px" />
                 <img src="http://placehold.it/60x45" alt="..." class="img-rounded pull-left" ng-show="user.ProfilePictureBase64.length == 0">
                 <div style="margin-left: 70px;">

@@ -29,8 +29,8 @@ namespace Tweetus.Web.Managers
         {
             var result = await _repository.Tweets
                 .Find(t => t.UserId == userId)
-                .SortByDescending(t => t.CreatedOn)
-                .Limit(10)
+                //.SortByDescending(t => t.CreatedOn)
+                //.Limit(10)
                 .ToListAsync();
 
             return result.ToList();

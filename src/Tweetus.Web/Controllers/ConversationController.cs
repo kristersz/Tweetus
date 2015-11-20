@@ -9,6 +9,7 @@ using Microsoft.AspNet.Mvc;
 using MongoDB.Bson;
 using Tweetus.Web.Managers;
 using Tweetus.Web.Models;
+using Tweetus.Web.Services.Mappers;
 using Tweetus.Web.Utilities.Extensions;
 using Tweetus.Web.ViewModels;
 
@@ -41,16 +42,9 @@ namespace Tweetus.Web.Controllers
                 conversationVM.Name = conversation.Name;
 
                 var lastMessage = conversation.Messages.OrderByDescending(m => m.SentOn).FirstOrDefault();
-
-                var messageVM = new MessageVM();
                 var messageUser = await _userManager.FindByIdAsync(lastMessage.UserIdFrom.ToString());
 
-                messageVM.MessageId = lastMessage.Id.ToString();
-                messageVM.Username = messageUser.UserName;
-                messageVM.Content = lastMessage.Content;
-                messageVM.SentOn = lastMessage.SentOn;
-
-                conversationVM.Messages.Add(messageVM);
+                conversationVM.Messages.Add(MessageMapper.MapMessageToViewModel(lastMessage, messageUser.UserName));
 
                 viewModels.Add(conversationVM);
             }
@@ -85,15 +79,7 @@ namespace Tweetus.Web.Controllers
                 {
                     ConversationId = conversation.Id.ToString(),
                     Name = conversation.Name,
-                    Messages = new List<MessageVM>() {
-                        new MessageVM()
-                        {
-                            MessageId = conversation.Messages[0].Id.ToString(),
-                            Username = User.GetUserName(),
-                            Content = conversation.Messages[0].Content,
-                            SentOn = conversation.Messages[0].SentOn
-                        }
-                    }
+                    Messages = new List<MessageVM>() { MessageMapper.MapMessageToViewModel(conversation.Messages[0], User.GetUserName()) }
                 };
 
                 result.IsValid = true;
@@ -121,15 +107,8 @@ namespace Tweetus.Web.Controllers
 
                 foreach (var message in conversation.Messages)
                 {
-                    var messageVM = new MessageVM();
                     var messageUser = await _userManager.FindByIdAsync(message.UserIdFrom.ToString());
-
-                    messageVM.MessageId = message.Id.ToString();
-                    messageVM.Username = messageUser.UserName;
-                    messageVM.Content = message.Content;
-                    messageVM.SentOn = message.SentOn;
-
-                    conversationVM.Messages.Add(messageVM);
+                    conversationVM.Messages.Add(MessageMapper.MapMessageToViewModel(message, messageUser.UserName));
                 }
 
                 result.Value = conversationVM;
@@ -152,14 +131,7 @@ namespace Tweetus.Web.Controllers
             {
                 var newMessage = await _conversationManager.SendNewMessage(conversationId, User.GetUserId(), message);
 
-                result.Value = new MessageVM()
-                {
-                    MessageId = newMessage.Id.ToString(),
-                    Username = User.GetUserName(),
-                    Content = newMessage.Content,
-                    SentOn = newMessage.SentOn
-                };
-
+                result.Value = MessageMapper.MapMessageToViewModel(newMessage, User.GetUserName());
                 result.IsValid = true;
             }
             catch (Exception ex)

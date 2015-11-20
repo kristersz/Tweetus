@@ -36,11 +36,11 @@
                 </ul>
             </div>
 
-            <div ng-hide="vm.IsViewersProfile">
-                <button type="button" class="btn btn-primary col-md-12" ng-click="followUser()" ng-hide="vm.ViewerAlreadyFollowing">
+            <div ng-hide="vm.IsCurrentUsersProfile">
+                <button type="button" class="btn btn-primary col-md-12" ng-click="followUser()" ng-hide="vm.CurrentUserAlreadyFollowing">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Follow {{ vm.UserName }}
                 </button>
-                <button type="button" class="btn btn-danger col-md-12" ng-show="vm.ViewerAlreadyFollowing">
+                <button type="button" class="btn btn-danger col-md-12" ng-show="vm.CurrentUserAlreadyFollowing">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unfollow {{ vm.UserName }}
                 </button>
                 <button type="button" class="btn btn-primary col-md-12 margin-top" data-toggle="modal" data-target="#tweetToUserModal">
@@ -74,7 +74,7 @@
                         </div>
 
                         <div class="list-group">
-                            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item" ng-repeat="user in vm.FollowingUsers">
+                            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item user-tile" ng-repeat="user in vm.FollowingUsers">
                                 <img ng-src="data:image/jpeg;base64,{{user.ProfilePictureBase64}}" ng-show="user.ProfilePictureBase64.length > 0" class="img-rounded img-responsive pull-left" style="width: 60px; height: 45px" />
                                 <img src="http://placehold.it/60x45" alt="..." class="img-rounded pull-left" ng-show="user.ProfilePictureBase64.length == 0">
                                 <div style="margin-left: 70px;">
@@ -90,7 +90,7 @@
                         </div>
 
                         <div class="list-group">
-                            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item" ng-repeat="user in vm.Followers">
+                            <a ng-href="/User/Profile?username={{user.UserName}}" class="list-group-item user-tile" ng-repeat="user in vm.Followers">
                                 <img ng-src="data:image/jpeg;base64,{{user.ProfilePictureBase64}}" ng-show="user.ProfilePictureBase64.length > 0" class="img-rounded img-responsive pull-left" style="width: 60px; height: 45px" />
                                 <img src="http://placehold.it/60x45" alt="..." class="img-rounded pull-left" ng-show="user.ProfilePictureBase64.length == 0">
                                 <div style="margin-left: 70px;">
@@ -108,8 +108,9 @@
                         <div class="panel panel-primary" ng-repeat="tweet in vm.LikedTweets | orderBy: '-TweetedOn'">
                             <div class="panel-heading">
                                 <h3 class="panel-title">
-                                    <a ng-href="/User/Profile?username={{tweet.TweetedByHandle}}"><strong>{{ tweet.TweetedByName }}</strong></a>
-                                    @@{{ tweet.TweetedByHandle }} - {{ tweet.TweetedOn | date:'dd MMM HH:mm' }}
+                                    <a ng-href="/User/Profile?username={{tweet.TweetedByUserName}}"><strong>{{ tweet.TweetedByFullName }}</strong></a>
+                                    @@{{ tweet.TweetedByUserName }} - {{ tweet.TweetedOn | date:'dd MMM HH:mm' }}
+                                    <span class="label label-success" ng-show="tweet.RetweetedFromUserName">Retweeted from {{ tweet.RetweetedFromUserName }}</span>
                                 </h3>
                             </div>
                             <div class="panel-body">
@@ -130,9 +131,6 @@
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm" disabled>
                                     <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Liked
-                                </button>
-                                <button type="button" class="btn btn-default btn-sm">
-                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
                                 </button>
                             </div>
                         </div>
