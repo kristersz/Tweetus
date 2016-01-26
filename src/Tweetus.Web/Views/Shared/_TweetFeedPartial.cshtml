@@ -15,7 +15,7 @@
 
         <img ng-src="{{tweet.ImageUrl}}" ng-show="tweet.ImageUrl.length > 0" class="img-responsive" />
 
-        <div class="row margin-top">
+        <div class="row margin-top" ng-show="tweet.Latitude > 0 && tweet.Longitude > 0">
             <div class="col-md-12" style="word-wrap: break-word; font-size: 1em">
                 <p><b>Tweeted from: </b>{{ tweet.Address }}</p>
             </div>

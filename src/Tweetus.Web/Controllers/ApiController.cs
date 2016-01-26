@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
@@ -8,7 +6,6 @@ using Tweetus.Web.Helpers;
 using Tweetus.Web.Managers;
 using Tweetus.Web.Models;
 using Tweetus.Web.Models.Integration;
-using Tweetus.Web.Utilities.Extensions;
 
 namespace Tweetus.Web.Controllers
 {
