@@ -1,11 +1,11 @@
 ﻿{
-  "version": "1.0-beta8",
+  "version": "1.0-rc1-final",
   "authors": [ "Grant Megrabyan" ],
   "description": "ASP.NET 5 Identity 3 provider with MongoDB as storage",
   "dependencies": {
-    "Microsoft.AspNet.Identity": "3.0.0-beta8",
+    "Microsoft.AspNet.Identity": "3.0.0-rc1-final",
     "MongoDB.Driver": "2.1.0",
-    "Microsoft.Framework.DependencyInjection": "1.0.0-beta8"
+    "Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final"
   },
 
   "frameworks": {

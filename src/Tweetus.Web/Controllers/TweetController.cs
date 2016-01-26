@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -17,8 +20,6 @@ using Tweetus.Web.Utilities;
 using Tweetus.Web.Utilities.Extensions;
 using Tweetus.Web.ViewModels;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Tweetus.Web.Controllers
 {
     public class TweetController : BaseController
@@ -26,18 +27,20 @@ namespace Tweetus.Web.Controllers
         private readonly TweetManager _tweetManager;
         private readonly UserRelationshipManager _userRelationshipManager;
         private readonly NotificationManager _notificationManager;
+        private readonly IHostingEnvironment _environment;
 
         public TweetController(UserManager<ApplicationUser> userManager, 
             TweetManager tweetManager, 
             UserRelationshipManager userRelationshipManager,
-            NotificationManager notificationManager) : base(userManager)
+            NotificationManager notificationManager,
+            IHostingEnvironment environment) : base(userManager)
         {
             _tweetManager = tweetManager;
             _userRelationshipManager = userRelationshipManager;
             _notificationManager = notificationManager;
+            _environment = environment;
         }
 
-        // GET: /<controller>/
         public IActionResult Index()
         {
             return View();
@@ -95,62 +98,98 @@ namespace Tweetus.Web.Controllers
         [Produces("text/plain")]
         public async Task<JsonResult> PostTweet(PostTweetVM tweet)
         {
-            var user = await GetCurrentUserAsync();
-            var now = DateTime.Now;
-            var file = tweet.File;
+            var result = new JsonServiceResult<TweetVM>();
 
-            var newTweet = new Tweet()
+            try
             {
-                Content = tweet.Content,
-                UserId = user.Id.ToObjectId(),
-                CreatedOn = now
-            };
+                var user = await GetCurrentUserAsync();
+                var now = DateTime.Now;
+                var file = tweet.File;
 
-            if (file != null)
-            {
-                var allowedExtensions = new string[] { ".jpg", ".png", ".gif" };
-
-                if (file.Length > 0)
+                var newTweet = new Tweet()
                 {
-                    var parsedContentDisposition = ContentDispositionHeaderValue.Parse(file.ContentDisposition);
-                    var filename = parsedContentDisposition.FileName.Trim('"');
+                    Content = tweet.Content,
+                    UserId = user.Id.ToObjectId(),
+                    CreatedOn = now
+                };
 
-                    string ext = Path.GetExtension(filename).ToLower();
+                if (tweet.LocationEnabled)
+                {
+                    double latitude;
+                    double longitude;
 
-                    if (allowedExtensions.Contains(ext))
+                    if (Double.TryParse(tweet.Latitude, NumberStyles.AllowDecimalPoint, NumberFormatInfo.InvariantInfo, out latitude)
+                        && Double.TryParse(tweet.Longitude, NumberStyles.AllowDecimalPoint, NumberFormatInfo.InvariantInfo, out longitude))
                     {
-                        using (var reader = file.OpenReadStream())
+                        newTweet.Latitude = latitude;
+                        newTweet.Longitude = longitude;
+                    }
+                }
+
+                if (file != null)
+                {
+                    var allowedExtensions = new string[] { ".jpg", ".png", ".gif" };
+
+                    if (file.Length > 0)
+                    {
+                        var parsedContentDisposition = ContentDispositionHeaderValue.Parse(file.ContentDisposition);
+                        var fileName = parsedContentDisposition.FileName.Trim('"');
+
+                        string ext = Path.GetExtension(fileName).ToLower();
+
+                        if (allowedExtensions.Contains(ext))
                         {
-                            newTweet.FileContent = reader.ToByteArray();
+                            var userAsciiName = user.NormalizedUserName.ToAsciiString();
+                            var fileNameHash = fileName.GetHashCode();
+
+                            if (fileNameHash < 0)
+                                fileNameHash = fileNameHash * -1;
+
+                            var mediaDir = Path.Combine(_environment.WebRootPath, "media");
+                            var userDir = Path.Combine(mediaDir, userAsciiName);
+
+                            Directory.CreateDirectory(userDir);
+
+                            var filePath = Path.Combine(userDir, fileNameHash.ToString());
+
+                            await file.SaveAsAsync(string.Format("{0}{1}", filePath, ext));
+
                             newTweet.FileMimeType = file.ContentType;
-                            newTweet.FileOriginalName = filename;
+                            newTweet.FilePath = string.Format("/media/{0}/{1}{2}", userAsciiName, fileNameHash, ext);
                         }
                     }
                 }
-            }                                 
 
-            await _tweetManager.CreateTweet(newTweet);
+                await _tweetManager.CreateTweet(newTweet);
 
-            var mentionedUserNames = TweetUtils.ExtractUserMentions(tweet.Content);
+                var mentionedUserNames = TweetUtils.ExtractUserMentions(tweet.Content);
 
-            foreach (var mentionedUserName in mentionedUserNames)
-            {
-                var mentionedUser = await _userManager.FindByNameAsync(mentionedUserName.ToUpper());
-
-                if (mentionedUser != null)
+                foreach (var mentionedUserName in mentionedUserNames)
                 {
-                    await _notificationManager.CreateNewNotification(mentionedUser.Id.ToObjectId(), NotificationType.Mention, user.Id.ToObjectId(), newTweet.Id);
-                }               
+                    var mentionedUser = await _userManager.FindByNameAsync(mentionedUserName.ToUpper());
+
+                    if (mentionedUser != null)
+                    {
+                        await _notificationManager.CreateNewNotification(mentionedUser.Id.ToObjectId(), NotificationType.Mention, user.Id.ToObjectId(), newTweet.Id);
+                    }
+                }
+
+                var viewModel = new TweetVM();
+
+                viewModel.Content = tweet.Content;
+                viewModel.TweetedByFullName = user.FullName;
+                viewModel.TweetedByUserName = user.UserName;
+                viewModel.TweetedOn = now;
+
+                result.Value = viewModel;
+                result.IsValid = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
             }
 
-            var viewModel = new TweetVM();
-
-            viewModel.Content = tweet.Content;
-            viewModel.TweetedByFullName = user.FullName;
-            viewModel.TweetedByUserName = user.UserName;
-            viewModel.TweetedOn = now;
-
-            return Json(viewModel);
+            return Json(result); 
         }
 
         [HttpPost]
@@ -194,9 +233,8 @@ namespace Tweetus.Web.Controllers
                 await _tweetManager.CreateTweet(new Tweet() {
                     Content = originalTweet.Content,
                     UserId = currentUserObjectId,
-                    FileContent = originalTweet.FileContent,
                     FileMimeType = originalTweet.FileMimeType,
-                    FileOriginalName = originalTweet.FileOriginalName,
+                    FilePath = originalTweet.FilePath,
                     CreatedOn = DateTime.Now,
                     RetweetedFromId = originalTweet.Id,
                     RetweetedFromUserName = originalTweetUser.UserName

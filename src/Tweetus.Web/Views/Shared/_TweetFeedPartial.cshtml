@@ -13,7 +13,13 @@
             </div>
         </div>
 
-        <img ng-src="data:{{tweet.ImageMimeType}};base64,{{tweet.ImageBase64}}" ng-show="tweet.ImageBase64.length > 0" class="img-responsive" />
+        <img ng-src="{{tweet.ImageUrl}}" ng-show="tweet.ImageUrl.length > 0" class="img-responsive" />
+
+        <div class="row margin-top">
+            <div class="col-md-12" style="word-wrap: break-word; font-size: 1em">
+                <p><b>Tweeted from: </b>{{ tweet.Address }}</p>
+            </div>
+        </div>
     </div>
     <div class="panel-footer">
         <button type="button" class="btn btn-default btn-sm" ng-click="openReply(tweet)">

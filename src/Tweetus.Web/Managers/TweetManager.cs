@@ -20,6 +20,11 @@ namespace Tweetus.Web.Managers
             return await _repository.Tweets.Find(t => t.Id == id).FirstOrDefaultAsync();
         }
 
+        public async Task<IList<Tweet>> GetAllTweets()
+        {
+            return await _repository.Tweets.Find(new BsonDocument()).ToListAsync();
+        }
+
         public async Task<IList<Tweet>> GetTweetsByIds(List<ObjectId> ids)
         {
             return await _repository.Tweets.Find(t => ids.Contains(t.Id)).ToListAsync();

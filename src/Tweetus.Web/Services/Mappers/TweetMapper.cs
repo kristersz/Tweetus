@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Tweetus.Web.Data.Documents;
 using Tweetus.Web.Models;
 using Tweetus.Web.ViewModels;
@@ -28,13 +25,15 @@ namespace Tweetus.Web.Services.Mappers
             {
                 TweetId = tweet.Id.ToString(),
                 Content = tweet.Content,
-                ImageBase64 = (tweet.FileContent != null) ? Convert.ToBase64String(tweet.FileContent) : string.Empty,
+                ImageUrl = (tweet.FilePath != null) ? tweet.FilePath : string.Empty,
                 ImageMimeType = (tweet.FileMimeType != null) ? tweet.FileMimeType : string.Empty,
                 TweetedByUserId = user.Id,
                 TweetedByFullName = user.FullName,
                 TweetedByUserName = user.UserName,
                 TweetedOn = tweet.CreatedOn,
-                RetweetedFromUserName = tweet.RetweetedFromUserName
+                RetweetedFromUserName = tweet.RetweetedFromUserName,
+                Latitude = tweet.Latitude,
+                Longitude = tweet.Longitude
             };
         }
     }

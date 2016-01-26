@@ -1,5 +1,9 @@
 ﻿@using (Html.BeginForm("PostTweet", "Tweet", null, FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm", target = "uploadTarget" }))
 {
+    <input type="hidden" name="LocationEnabled" value="{{locationEnabled}}" />
+    <input type="hidden" name="Latitude" value="{{currentLatitude}}" />
+    <input type="hidden" name="Longitude" value="{{currentLongitude}}" />
+
     <div class="form-group">
         <textarea class="form-control" name="Content" rows="3" draggable="false" ng-model="currentTweet"></textarea>
         <span class="pull-right" ng-class="{ 'text-primary': currentTweet.length <= 169, 'text-danger': currentTweet.length > 169 }">
@@ -13,7 +17,7 @@
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>  Tweet
             </button>
         </div>
-        <div class="form-group col-sm-8 col-sm-offset-2">
+        <div class="form-group col-sm-10">
             <div class="input-group">
                 <span class="input-group-btn">
                     <span class="btn btn-primary btn-file">
@@ -23,6 +27,38 @@
                 <input type="text" class="form-control" readonly>
             </div>
         </div>
-    </div>       
+    </div>
+
+    <button class="btn btn-default" id="locationToggle" ng-click="enableDisableLocation()" type="button">
+        {{locationButtonText}}
+    </button>
+
+    <button type="button" class="btn btn-default" id="mapOpenButton" ng-show="locationEnabled" data-toggle="modal" data-target="#mapModal">
+        Pick a location on map
+    </button>
+    <div id="location" ng-show="locationEnabled">
+        <div class="well margin-top">
+            <p><label>Current latitude:</label> <input type="text" class="form-control" ng-model="currentLatitude" /></p>
+            <p><label>Current longitude:</label> <input type="text" class="form-control" ng-model="currentLongitude" /></p>
+            <p><label>Current address:</label> <span>{{currentAddress}}</span></p>
+        </div>
+    </div>
 }
-<iframe id="uploadTarget" name="uploadTarget" height="0" width="0" frameborder="0" scrolling="yes" style="display: none"></iframe>  
+<iframe id="uploadTarget" name="uploadTarget" height="0" width="0" frameborder="0" scrolling="yes"></iframe>
+
+<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Map</h4>
+            </div>
+            <div class="modal-body">
+                <div id="map" style="width: 550px; height: 400px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
